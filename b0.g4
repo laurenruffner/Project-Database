@@ -6,6 +6,8 @@ literal: (string_literal | integer);
 relation_name: identifier;
 attribute_name: identifier;
 operand: (attribute_name | literal);
+type: 'VARCHAR' '(' integer ')' | 'INTEGER';
+attribute_list: attribute_name (',' attribute_name)*;
 OP: '==' | '!=' | '<' | '>' | '<=' | '>=';
 ALPHA: [a-zA-Z_]+; //..'z'+ | 'A'..'Z'+ | '_'+;
 DIGIT: [0-9]+;
