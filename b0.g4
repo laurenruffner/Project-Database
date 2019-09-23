@@ -1,5 +1,5 @@
 grammar b0;
-integer: DIGIT+;
+integer: DIGIT DIGIT*;
 identifier: ALPHA (ALPHA | DIGIT)*;
 string_literal:  '"' (ALPHA | DIGIT)+ '"'; //doesn't allow for empty strings
 literal: (string_literal | integer);
