@@ -22,9 +22,9 @@ comparison: operand OP operand | '(' condition ')';
 //batch 3
 expr: atomic_expr | selection | projection | renaming | union | difference | product | natural_join;
 atomic_expr: relation_name | '(' expr ')';
-selection: 'SELECT' '(' condition ')' atomic_expr;
-projection: 'PROJECT' '(' attribute_list ')' atomic_expr;
-renaming: 'RENAME' '(' attribute_list ')' atomic_expr;
+selection: 'select' '(' condition ')' atomic_expr;
+projection: 'project' '(' attribute_list ')' atomic_expr;
+renaming: 'rename' '(' attribute_list ')' atomic_expr;
 union: atomic_expr '+' atomic_expr;
 difference: atomic_expr '-' atomic_expr;
 product: atomic_expr '*' atomic_expr;
@@ -35,7 +35,10 @@ create_cmd: 'CREATE TABLE' relation_name '(' typed_attribute_list ')' 'PRIMARY K
 update_cmd: 'UPDATE' relation_name 'SET' attribute_name '=' literal (',' attribute_name '=' literal)* 'WHERE' condition;
 insert_cmd: 'INSERT INTO' relation_name 'VALUES FROM (' literal (',' literal)* ')' | 'INSERT INTO' relation_name 'VALUES FROM RELATION' expr;
 delete_cmd: 'DELETE FROM' relation_name 'WHERE' condition;
-
+//batch 5
+command: (open_cmd |  close_cmd | write_cmd | exit_cmd | show_cmd | create_cmd | update_cmd | insert_cmd | delete_cmd) ';';
+query: relation_name '<-' expr ';';
+program:  (query | command)*;
 //batch 0 cont.
 OP: '==' | '!=' | '<' | '>' | '<=' | '>=';
 ALPHA: [a-zA-Z_]+;
