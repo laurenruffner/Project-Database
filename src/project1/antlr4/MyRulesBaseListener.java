@@ -6,9 +6,10 @@ import project1.Dbms;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyRulesBaseListener extends RulesBaseListener{
+public class MyRulesBaseListener extends RulesBaseListener {
     ArrayList<String> stack;
     Dbms myDbms;
+
     //default constructor
     public MyRulesBaseListener() {
         myDbms = new Dbms();
@@ -35,8 +36,6 @@ public class MyRulesBaseListener extends RulesBaseListener{
 //            i++;
 //        }
 //    }
-
-
 
 
 //    @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx){
@@ -73,12 +72,13 @@ public class MyRulesBaseListener extends RulesBaseListener{
 //    }
 
 
-    @Override public void enterCreate_cmd(RulesParser.Create_cmdContext ctx) {
+    @Override
+    public void enterCreate_cmd(RulesParser.Create_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
         //System.out.println(table_name);
         myDbms.createTable(table_name);
-        myDbms.getTable();
+        myDbms.getTableName();
         ParseTree new_tree = children.get(3);
         int children_num = children.get(3).getChildCount();
 
@@ -98,7 +98,7 @@ public class MyRulesBaseListener extends RulesBaseListener{
             if (count == 0) {
                 name = new_tree.getChild(i).getText();
                 count++;
-            }  else if(count == 1 && i == (children_num - 1)) {
+            } else if (count == 1 && i == (children_num - 1)) {
                 type = new_tree.getChild(i).getText();
                 System.out.println("End of attribute lists-------------");
                 myDbms.table_list.get(myDbms.table_num).entercolumns(attr_iteration, name, type);
@@ -118,51 +118,11 @@ public class MyRulesBaseListener extends RulesBaseListener{
             i++;
             System.out.println("Name: " + name + " Type: " + type);
         }
-        System.out.println("Get columns from table: " + myDbms.getTable());
+        System.out.println("Get columns from table: " + myDbms.getTableName());
         myDbms.table_list.get(myDbms.table_num).getColumnNames();
 
         System.out.println("-------------------end of table creation ------------------");
-//
         myDbms.iterateTable();
     }
-
-//    @Override public void enterTyped_attribute_list(RulesParser.Typed_attribute_listContext ctx) {
-//        List<ParseTree> children = ctx.children;
-//        System.out.println(children.size());
-//
-//        String relationName;
-//        String type = null;
-//        int i = 0;
-//        int count = 0;
-//        String name = null;
-//        while (i < children.size()) {
-//           // System.out.println(children.get(i).getChildCount());
-//
-//            if (count == 0) {
-//                name = children.get(i).getText();
-//                System.out.println(name);
-//                count++;
-//            }
-//            else if (count == 1 && children.get(i).getChildCount() > 1){
-//                int  x = 1;
-//                type = children.get(i).getChild(0).getText();
-//                System.out.print(type);
-//                count++;
-//                //        "VARCHAR";
-//            }
-//            else if (count == 1){
-//                type = children.get(i).getText();
-//                count++;
-//            }
-//            else if (count == 2 && children.get(i).getText() == "," ){
-//                count = 0;
-//                relationName = children.get(i).getText();
-//                System.out.println(relationName);
-//            }
-//            i++;
-//            System.out.println("Name: " + name + " Type: " + type);
-//        }
-//    }
-
 }
 
