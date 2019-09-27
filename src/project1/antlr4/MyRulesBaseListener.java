@@ -1,5 +1,6 @@
 package project1.antlr4;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jetbrains.annotations.NotNull;
 import project1.Dbms;
 
 import java.util.ArrayList;
@@ -73,14 +74,11 @@ public class MyRulesBaseListener extends RulesBaseListener{
 
 
     @Override public void enterCreate_cmd(RulesParser.Create_cmdContext ctx) {
-
         List<ParseTree> children = ctx.children;
-
         String table_name = children.get(1).getText();
-
         System.out.println(table_name);
-
         myDbms.createTable(table_name);
+
 
 
 //        System.out.println(table_name);

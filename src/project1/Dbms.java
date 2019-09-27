@@ -8,7 +8,8 @@ public class Dbms {
 
     public void createTable(String name) {
         Table int1 = new Table(name);
-        tables.add(table_num, int1);
+        //WTF IS GOING ON
+        tables.add(int1);
     }
 
     public void iterateTable(){
