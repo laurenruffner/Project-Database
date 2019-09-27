@@ -15,27 +15,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         myDbms = new Dbms();
     }
 
-//    public void iterate(ParseTree tree){
-//        List<ParseTree> children = tree.;
-//        //System.out.println(children.size());
-//
-//        String relationName;
-//        int i = 0;
-//        while (i < children.size()){
-//            if (i == 0){
-//                ParseTree _test = children.get(0);
-//                //System.out.println(_test);
-//            }
-//            else {
-//                if (children.get(i).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(i).getText();
-//                //System.out.println(relationName);
-//            }
-//            i++;
-//        }
-//    }
 
 
 //    @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx){
@@ -74,6 +53,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void enterCreate_cmd(RulesParser.Create_cmdContext ctx) {
+        int table_index = myDbms.emptyTableLocation();
+
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
         //System.out.println(table_name);
@@ -95,15 +76,19 @@ public class MyRulesBaseListener extends RulesBaseListener {
             //System.out.println("count: " + count);
             //System.out.println("getText: " + new_tree.getChild(i).getText());
             //System.out.println("Attribute iteration: " + attr_iteration);
+
             if (count == 0) {
                 name = new_tree.getChild(i).getText();
                 count++;
+            } else if (count == 1 && i == (children_num - 1) &&  new_tree.getChild(i).getChildCount() > 1){
+                type = new_tree.getChild(i).getChild(0).getText();
+                System.out.println("End of attribute lists-------------");
+                myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
             } else if (count == 1 && i == (children_num - 1)) {
                 type = new_tree.getChild(i).getText();
                 System.out.println("End of attribute lists-------------");
-                myDbms.table_list.get(myDbms.table_num).entercolumns(attr_iteration, name, type);
+                myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
             } else if (count == 1 && new_tree.getChild(i).getChildCount() > 1) {
-                int x = 1;
                 type = new_tree.getChild(i).getChild(0).getText();
                 count++;
             } else if (count == 1) {
@@ -111,7 +96,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 count++;
             } else if (count == 2 && new_tree.getChild(i).getText().compareTo(",") == 0) {
                 System.out.println("There's another Attribute ----------");
-                myDbms.table_list.get(myDbms.table_num).entercolumns(attr_iteration, name, type);
+                myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
                 count = 0;
                 attr_iteration++;
             }
@@ -119,10 +104,10 @@ public class MyRulesBaseListener extends RulesBaseListener {
             System.out.println("Name: " + name + " Type: " + type);
         }
         System.out.println("Get columns from table: " + myDbms.getTableName());
-        myDbms.table_list.get(myDbms.table_num).getColumnNames();
+        myDbms.table_list.get(table_index).getColumnNames();
 
         System.out.println("-------------------end of table creation ------------------");
-        myDbms.iterateTable();
+        //myDbms.iterateTable();
     }
 }
 
