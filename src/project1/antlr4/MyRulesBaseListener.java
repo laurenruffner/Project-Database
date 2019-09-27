@@ -76,49 +76,54 @@ public class MyRulesBaseListener extends RulesBaseListener{
     @Override public void enterCreate_cmd(RulesParser.Create_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
-        System.out.println(table_name);
+        //System.out.println(table_name);
         myDbms.createTable(table_name);
+        myDbms.getTable();
+        ParseTree new_tree = children.get(3);
+        int children_num = children.get(3).getChildCount();
 
+        //used variables
+        String type = null;
+        int attr_iteration = 0;
+        int i = 0;
+        int count = 0;
+        String name = null;
 
+        while (i < children_num) {
+            // THESE WERE TESTS FOR CASES
+            //System.out.println("child count: " + children_num);
+            //System.out.println("count: " + count);
+            //System.out.println("getText: " + new_tree.getChild(i).getText());
+            //System.out.println("Attribute iteration: " + attr_iteration);
+            if (count == 0) {
+                name = new_tree.getChild(i).getText();
+                count++;
+            }  else if(count == 1 && i == (children_num - 1)) {
+                type = new_tree.getChild(i).getText();
+                System.out.println("End of attribute lists-------------");
+                myDbms.table_list.get(myDbms.table_num).entercolumns(attr_iteration, name, type);
+            } else if (count == 1 && new_tree.getChild(i).getChildCount() > 1) {
+                int x = 1;
+                type = new_tree.getChild(i).getChild(0).getText();
+                count++;
+            } else if (count == 1) {
+                type = new_tree.getChild(i).getText();
+                count++;
+            } else if (count == 2 && new_tree.getChild(i).getText().compareTo(",") == 0) {
+                System.out.println("There's another Attribute ----------");
+                myDbms.table_list.get(myDbms.table_num).entercolumns(attr_iteration, name, type);
+                count = 0;
+                attr_iteration++;
+            }
+            i++;
+            System.out.println("Name: " + name + " Type: " + type);
+        }
+        System.out.println("Get columns from table: " + myDbms.getTable());
+        myDbms.table_list.get(myDbms.table_num).getColumnNames();
 
-//        System.out.println(table_name);
-//        ParseTree new_tree = children.get(3);
-//        //System.out.println(children.get(3).getText());
-//        int children_num = children.get(3).getChildCount();
+        System.out.println("-------------------end of table creation ------------------");
 //
-//        String relationName;
-//        String type = null;
-//        int attr_iteration = 0;
-//        int i = 0;
-//        int count = 0;
-//        String name = null;
-//        while (i < children_num) {
-//            // System.out.println(children.get(i).getChildCount());
-//            if (count == 0) {
-//                name = new_tree.getChild(i).getText();
-//                //System.out.println(name);
-//                count++;
-//            } else if (count == 1 && new_tree.getChild(i).getChildCount() > 1) {
-//                int x = 1;
-//                type = new_tree.getChild(i).getChild(0).getText();
-//                //System.out.print(type);
-//                count++;
-//                //        "VARCHAR";
-//            } else if (count == 1) {
-//                type = new_tree.getChild(i).getText();
-//                count++;
-//            } else if (count == 2 && new_tree.getChild(i).getText() == ",") {
-//                myDbms.entercolumns(attr_iteration, name, type);
-//                count = 0;
-//                attr_iteration++;
-//                //relationName = new_tree.getChild(i).getText();
-//                //System.out.println(relationName);
-//            }
-//            i++;
-//            //System.out.println("Name: " + name + " Type: " + type);
-//        }
-//
-//        myDbms.iterateTable();
+        myDbms.iterateTable();
     }
 
 //    @Override public void enterTyped_attribute_list(RulesParser.Typed_attribute_listContext ctx) {
