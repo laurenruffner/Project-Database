@@ -1,30 +1,35 @@
 package project1;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 public class Dbms {
-    Hashtable<Integer, ArrayList> table;
+    ArrayList<Table> tables;
+    int table_num = 0;
+
+    public void createTable(String name) {
+        Table int1 = new Table(name);
+        tables.add(table_num, int1);
+    }
+
+    public void iterateTable(){
+        table_num++;
+    }
 
     public void entercolumns(int column_num, String column, String data_type){
 
         //HOW TO DEAL WITH DATA TYPES VARCHAR AND INTEGER;
+        tables.get(table_num).column_name.add(column_num, column);
 
-        ArrayList<String> arrayList = new ArrayList<String>();
-//        if (data_type == "VARCHAR"){
-//            ArrayList<String> arrayList = new ArrayList<String>();
-//        }
-//        else {
-//            ArrayList<Integer> arrayList = new ArrayList<Integer>();
-//        }
-        arrayList.add(0,column);
-        table.put(column_num, arrayList);
+        //ArrayList<String> arrayList = new ArrayList<String>();
+        if (data_type == "VARCHAR"){
+            ArrayList<String> arrayList = new ArrayList<String>();
+            tables.get(table_num).table.add(column_num, arrayList);
+        }
+        else if (data_type == "INTERGER") {
+            ArrayList<Integer> arrayList = new ArrayList<Integer>();
+            tables.get(table_num).table.add(column_num, arrayList);
+        }
     }
-
-    public void enterdata(int entry_order_num){
-
-    }
-
 
 }
 
