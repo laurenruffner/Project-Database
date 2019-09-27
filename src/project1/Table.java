@@ -53,6 +53,26 @@ public class Table {
 
     // takes the column_num and the input (always parsed into a string) and then use boolean to know what to cast an int from string.
     public void insertData(int column_num, String input, boolean isInteger){
+        if (Boolean.compare(isInteger, true) == 0){
+            Integer int_input = Integer.valueOf(input);
+            table.get(column_num).add(int_input);
+        }
+        table.get(column_num).add(input);
+    }
 
+    public void printTable(){
+        int total_rows = table.get(0).size();
+        int total_columns = column_name.size();
+        System.out.println("--------------------" + table_name + "---------------");
+        for (int j=0; j< column_name.size(); j++){
+            System.out.print("|" + column_name + "|");
+        }
+        System.out.println();
+        for (int k=0; k < total_rows; k++){
+            for (int i = 0; i < total_columns; i++) {
+                System.out.print("|" + table.get(k).get(i) + "|" );
+            }
+            System.out.println();
+        }
     }
 }
