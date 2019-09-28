@@ -6,23 +6,70 @@ public class Table {
     public String table_name;
     public ArrayList<ArrayList> table;
     public ArrayList<String> column_name;
+    public ArrayList<String> primary_id;
 
     public Table(String name){
         table = new ArrayList<ArrayList>();
         column_name = new ArrayList<String>();
+        primary_id = new ArrayList<String>();
         table_name = name;
     }
+
+    //THIS RETURNS THE INDEX THAT CAN THEN BE THROWN INTO dataAtIndex TO RETRIEVE THE DATA WITH A SPECIFIC PRIMARY ID
+    public int getPrimaryIdIndex(ArrayList<String> search){
+        int column = 0;
+        int row = 0;
+        int total_row = table.get(0).size();
+        for (int i = 0; i < primary_id.size(); i++){
+            int column_num = getColumnNumber(primary_id.get(i));
+            for(int j =0; j < total_row; j++){
+                try {
+                    Integer.parseInt(search.get(i));
+                    if (Integer.valueOf(search.get(i)) == table.get(column_num).get(row)){
+                        column++;
+                    }
+                    else{
+                        row++;
+                    }
+                }
+                catch (NumberFormatException e) {
+                    if (search.get(i).compareTo((String) table.get(column_num).get(row)) == 0){
+                        column++;
+                    }
+                    else{
+                        row++;
+                    }
+                }
+            }
+
+        }
+
+        return row;
+    }
+
+    //THIS RETURNS THE DATA IN A VISUAL WAY AT A SPECIFIC INDEX --- Tweety, bird , 1
+    public void dataAtIndex (int index){
+        for (int j = 0; j < column_name.size(); j++){
+            System.out.print("|" + column_name.get(j) + "|");
+        }
+        System.out.println();
+        for(int i = 0; i < column_name.size(); i ++){
+            System.out.print("|" + table.get(i).get(index) + "|");
+        }
+        System.out.println();
+    };
 
     // This returns the index of the column of a specific name.
     // This can be used to pull the column from the table due to both tables having the same indices
     public int getColumnNumber(String c_name){
         for(int i=0; i < column_name.size(); i++){
-            if (c_name == column_name.get(i)){
+            if (c_name.compareTo(column_name.get(i)) == 0){
                 return i;
             }
         }
         return -1;
     }
+
 
     //Print Statement to test the column names of a certain table
     public void getColumnNames(){

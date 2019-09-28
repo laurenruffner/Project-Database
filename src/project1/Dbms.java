@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public class Dbms {
     public ArrayList<Table> table_list;
-    public ArrayList<ArrayList> primary_id;
     public ArrayList<Table> temp_table_list;
     public ArrayList<String> table_names;
     public int table_num = 0;
@@ -15,7 +14,7 @@ public class Dbms {
         table_list = new ArrayList<>();
         table_names = new ArrayList<>();
         temp_table_list = new ArrayList<>();
-        primary_id = new ArrayList<>();
+        //primary_id = new ArrayList<>();
     }
 
     //get empty table input with table_num ----- table_list.size()

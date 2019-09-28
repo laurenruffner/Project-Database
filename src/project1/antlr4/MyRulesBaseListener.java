@@ -7,12 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyRulesBaseListener extends RulesBaseListener {
-    int count = 0;
     Dbms myDbms;
+    int count_inserts = 0;
 
     //default constructor
     public MyRulesBaseListener() {
-        System.out.print("New Rules Base Listener");
         myDbms = new Dbms();
     }
 
@@ -55,16 +54,17 @@ public class MyRulesBaseListener extends RulesBaseListener {
         //CURRENTLY DOES NOTHING WITH THE SECOND CASE OF INSERT JUST DEALS WITH CREATING THE TABLES
 
         System.out.println("**********************************INSERT CMD**************************************");
+        count_inserts++;
         List<ParseTree> children = ctx.children;
         int children_size = children.size();
         System.out.println("Table Name: " + children.get(1).getText());
         int table_index = myDbms.indexOfTable(children.get(1).getText());
 
         //System.out.println("Table Index: " + table_index);
-
+        int count = 0;
         if (children.get(2).getText().compareTo("VALUES FROM (") == 0){
             int i = 3;
-            int count = 0;
+
             boolean isInteger;
             String data;
             while (i <  (children_size-1)){
@@ -90,7 +90,17 @@ public class MyRulesBaseListener extends RulesBaseListener {
             }
 
         }
+
         myDbms.table_list.get(table_index).printTable();
+
+        //TEST TO FIND PRIMARY ID
+//        if (count_inserts > 4) {
+//            ArrayList<String> Primary_test = new ArrayList<>();
+//            Primary_test.add("Tweety");
+//            Primary_test.add("bird");
+//            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
+//            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
+//        }
 
 //        String relationName;
 ////        int i = 0;
@@ -120,6 +130,27 @@ public class MyRulesBaseListener extends RulesBaseListener {
         String table_name = children.get(1).getText();
         myDbms.createTable(table_name);
         myDbms.getTableName();
+
+        //This fills the Primary Key into the ArrayList of strings called Primary ID
+
+        ParseTree primary_key = children.get(7);
+        int primary_key_num = children.get(7).getChildCount();
+
+        int pri_count = 0;
+        int k = 0;
+        while (k < primary_key_num){
+            if (pri_count == 0){
+                pri_count++;
+                myDbms.table_list.get(table_index).primary_id.add(primary_key.getChild(k).getText());
+            }
+            else if (pri_count == 1 && primary_key.getChild(k).getText().compareTo(",") == 0){
+                pri_count = 0;
+            }
+            k++;
+        }
+
+        //This adds the proper columns due to what the attribute list includes
+
         ParseTree new_tree = children.get(3);
         int children_num = children.get(3).getChildCount();
 
