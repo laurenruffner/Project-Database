@@ -23,6 +23,8 @@ class Main{
             String line = scanner.nextLine();
             if (line.length() != 0) { lines.add(line); }
         }
+
+        MyRulesBaseListener listener = new MyRulesBaseListener();
         for (String line : lines) {
 
             // CREATE A FOR LOOK TO ITERATE THROUGH EACH STRING OBJECT
@@ -41,7 +43,9 @@ class Main{
             //This creates the parse tree listener and  the parse tree walker
             RulesParser.ProgramContext programContext = parser.program();
             ParseTreeWalker walker = new ParseTreeWalker();
-            MyRulesBaseListener listener = new MyRulesBaseListener();
+
+            //This calls this thing over and over and over
+//            MyRulesBaseListener listener = new MyRulesBaseListener();
             walker.walk(listener, programContext);
 
 
