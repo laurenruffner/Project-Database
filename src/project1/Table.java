@@ -20,30 +20,153 @@ public class Table {
         int column = 0;
         int row = 0;
         int total_row = table.get(0).size();
-        for (int i = 0; i < primary_id.size(); i++){
-            int column_num = getColumnNumber(primary_id.get(i));
-            for(int j =0; j < total_row; j++){
-                try {
-                    Integer.parseInt(search.get(i));
-                    if (Integer.valueOf(search.get(i)) == table.get(column_num).get(row)){
-                        column++;
+        int column_num = getColumnNumber(primary_id.get(0));
+        for (int i = 0; i < total_row; i++) {
+            //System.out.println("Loop");
+            try {
+                //System.out.println("Comparing: " + search.get(column));
+                //System.out.println("To: " + table.get(column_num).get(row));
+                Integer.parseInt(search.get(column));
+                if (Integer.valueOf(search.get(column)) == table.get(column_num).get(row)){
+                    //System.out.println("Same");
+                    column++;
+                    for(int j = 1; j < search.size(); j++){
+                        int column_num_temp = getColumnNumber(primary_id.get(j));
+                        try {
+                            //System.out.println("Comparing: " + search.get(column));
+                            //System.out.println("To: " + table.get(column_num_temp).get(row));
+                            Integer.parseInt(search.get(column));
+                            if (Integer.valueOf(search.get(column)) == table.get(column_num_temp).get(row)){
+                              //  System.out.println("Same");
+                                column++;
+                                if (j == (search.size() - 1)){
+                                    return row;
+                                }
+                            }
+                            else{
+                                //System.out.println("Not Same");
+                                column--;
+                                row++;
+                                break;
+                            }
+                        }
+                        catch (NumberFormatException e) {
+                            if (search.get(column).compareTo((String) table.get(column_num_temp).get(row)) == 0){
+                                column++;
+                                //System.out.println("Same");
+                                if (j == (search.size() - 1)){
+                                    return row;
+                                }
+                            }
+                            else{
+                                //System.out.println("Different");
+                                column--;
+                                row++;
+                                break;
+                            }
+                        }
+                        if (j == (search.size() - 1)){
+                            return row;
+                        }
                     }
-                    else{
-                        row++;
+                    if (search.size() == 1){
+                        return row;
                     }
                 }
-                catch (NumberFormatException e) {
-                    if (search.get(i).compareTo((String) table.get(column_num).get(row)) == 0){
-                        column++;
+                else{
+                    //System.out.println("Not Same");
+                    row++;
+                }
+            }
+            catch (NumberFormatException e) {
+                if (search.get(column).compareTo((String) table.get(column_num).get(row)) == 0){
+                    //System.out.println("Here 1");
+                    //System.out.println("Same");
+                    column++;
+                    for(int j = 1; j < search.size(); j++){
+                        int column_num_temp = getColumnNumber(primary_id.get(j));
+                        try {
+                            //System.out.println("Comparing: " + search.get(column));
+                            //System.out.println("To: " + table.get(column_num_temp).get(row));
+                            Integer.parseInt(search.get(column));
+                            if (Integer.valueOf(search.get(column)) == table.get(column_num_temp).get(row)){
+                                //System.out.println("Same");
+                                column++;
+                                if (j == (search.size() - 1)){
+                                    return row;
+                                }
+                            }
+                            else{
+                                //System.out.println("Not Same");
+                                column--;
+                                row++;
+                                break;
+                            }
+                        }
+                        catch (NumberFormatException s) {
+                            if (search.get(column).compareTo((String) table.get(column_num_temp).get(row)) == 0){
+                                column++;
+                                //System.out.println("Same");
+                                if (j == (search.size() - 1)){
+                                    return row;
+                                }
+                            }
+                            else{
+                                //System.out.println("Different11");
+                                //System.out.println("i" + i + "total rows" + total_row);
+                                row++;
+                                column--;
+                                break;
+                            }
+                        }
+                        if (j == (search.size() - 1)){
+                            //System.out.println("Here Exit");
+                            return row;
+                        }
                     }
-                    else{
-                        row++;
+                    if (search.size() == 1){
+                        //System.out.println("Here Exit2");
+                        return row;
                     }
+                }
+                else{
+                    //System.out.println("Different");
+                    row++;
                 }
             }
 
         }
 
+//        for (int i = 0; i < primary_id.size(); i++){
+//            int column_num = getColumnNumber(primary_id.get(i));
+//            for(int j =0; j < total_row; j++){
+//                try {
+//                    System.out.println("Comparing: " + search.get(i));
+//                    System.out.println("To: " + table.get(column_num).get(row));
+//                    Integer.parseInt(search.get(i));
+//                    if (Integer.valueOf(search.get(i)) == table.get(column_num).get(row)){
+//
+//                        System.out.println("Same");
+//                        column++;
+//                    }
+//                    else{
+//                        System.out.println("Not Same");
+//                        row++;
+//                    }
+//                }
+//                catch (NumberFormatException e) {
+//                    if (search.get(i).compareTo((String) table.get(column_num).get(row)) == 0){
+//                        column++;
+//                    }
+//                    else{
+//                        row++;
+//                    }
+//                }
+//            }
+//
+//        }
+
+        System.out.println("Exit");
         return row;
     }
 
@@ -82,18 +205,13 @@ public class Table {
 
     // this allows you to enter columns into the table
     public void enterColumns(int column_num, String column, String data_type){
-        //HOW TO DEAL WITH DATA TYPES VARCHAR AND INTEGER;
-        //System.out.println("Enter Columns");
         column_name.add(column_num, column);
 
-        //ArrayList<String> arrayList = new ArrayList<String>();
         if (data_type.compareTo("VARCHAR") == 0){
-            //System.out.println("Adding string arrayList");
             ArrayList<String> arrayList = new ArrayList<String>();
             table.add(column_num, arrayList);
         }
         else if (data_type.compareTo("INTEGER") == 0) {
-            //System.out.println("Adding integer ArrayList");
             ArrayList<Integer> arrayInteger = new ArrayList<>();
             table.add(column_num, arrayInteger);
         }
@@ -103,20 +221,13 @@ public class Table {
 
     // takes the column_num and the input (always parsed into a string) and then use boolean to know what to cast an int from string.
     public void insertData(int column_num, String input, boolean isInteger){
-        //System.out.println("Column num" + column_num);
-        //getColumnNames();
-        //System.out.println("Size of table: " + table.size());
-        //System.out.println("In insert data");
         if (Boolean.compare(isInteger, true) == 0){
-            //System.out.println("Is Integer");
             Integer int_input = Integer.valueOf(input);
             table.get(column_num).add(int_input);
         }
         else {
-            //System.out.println("Is string");
             table.get(column_num).add(input);
         }
-        //System.out.println("End of insert");
     }
 
     public void printTable(){

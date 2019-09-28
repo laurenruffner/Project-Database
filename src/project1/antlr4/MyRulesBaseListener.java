@@ -59,12 +59,11 @@ public class MyRulesBaseListener extends RulesBaseListener {
         int children_size = children.size();
         System.out.println("Table Name: " + children.get(1).getText());
         int table_index = myDbms.indexOfTable(children.get(1).getText());
-
-        //System.out.println("Table Index: " + table_index);
         int count = 0;
+
+        //CASE ONLY WHEN IT IS INSERTING RAW DATA NOT VALUES FROM RELATION
         if (children.get(2).getText().compareTo("VALUES FROM (") == 0){
             int i = 3;
-
             boolean isInteger;
             String data;
             while (i <  (children_size-1)){
@@ -73,51 +72,29 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count++;
                 }
                 else if(children.get(i).getChild(0).getChildCount() >  1) {
-                    //System.out.println(children.get(i).getChild(0).getChildCount());
                     data = children.get(i).getChild(0).getChild(1).getText();
-                    //System.out.println("String: " + data);
-                    //System.out.println("Column #: " + count);
                     myDbms.table_list.get(table_index).insertData(count, data, false);
 
                 }
                 else{
                     data = children.get(i).getChild(0).getText();
-                    //System.out.println("Number: " + data);
-                    //System.out.println("Column #: " + count);
                     myDbms.table_list.get(table_index).insertData(count, data, true);
                 }
                 i++;
             }
 
         }
-
+        //Prints table not visually aesthetic
         myDbms.table_list.get(table_index).printTable();
 
-        //TEST TO FIND PRIMARY ID
-//        if (count_inserts > 4) {
-//            ArrayList<String> Primary_test = new ArrayList<>();
-//            Primary_test.add("Tweety");
-//            Primary_test.add("bird");
-//            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
-//            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
-//        }
-
-//        String relationName;
-////        int i = 0;
-////        while (i < children.size()){
-////            if (i == 0){
-////                ParseTree _test = children.get(0);
-////                System.out.println(_test);
-////            }
-////            else {
-////                if (children.get(i).getChildCount() != 0){
-////
-////                }
-////                relationName = children.get(i).getText();
-////                System.out.println(relationName);
-////            }
-////            i++;
-
+        //TEST TO FIND PRIMARY ID Info -- It works
+        if (count_inserts > 4) {
+            ArrayList<String> Primary_test = new ArrayList<>();
+            Primary_test.add("Tweety");
+            Primary_test.add("bird");
+            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
+            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
+        }
     }
 
 
@@ -162,22 +139,16 @@ public class MyRulesBaseListener extends RulesBaseListener {
         String name = null;
 
         while (i < children_num) {
-            // THESE WERE TESTS FOR CASES
-            //System.out.println("child count: " + children_num);
-            //System.out.println("count: " + count);
-            //System.out.println("getText: " + new_tree.getChild(i).getText());
-            //System.out.println("Attribute iteration: " + attr_iteration);
-
             if (count == 0) {
                 name = new_tree.getChild(i).getText();
                 count++;
             } else if (count == 1 && i == (children_num - 1) &&  new_tree.getChild(i).getChildCount() > 1){
                 type = new_tree.getChild(i).getChild(0).getText();
-                System.out.println("End of attribute lists-------------");
+                //System.out.println("End of attribute lists-------------");
                 myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
             } else if (count == 1 && i == (children_num - 1)) {
                 type = new_tree.getChild(i).getText();
-                System.out.println("End of attribute lists-------------");
+                //System.out.println("End of attribute lists-------------");
                 myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
             } else if (count == 1 && new_tree.getChild(i).getChildCount() > 1) {
                 type = new_tree.getChild(i).getChild(0).getText();
@@ -186,13 +157,13 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 type = new_tree.getChild(i).getText();
                 count++;
             } else if (count == 2 && new_tree.getChild(i).getText().compareTo(",") == 0) {
-                System.out.println("There's another Attribute ----------");
+                //System.out.println("There's another Attribute ----------");
                 myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
                 count = 0;
                 attr_iteration++;
             }
             i++;
-            System.out.println("Name: " + name + " Type: " + type);
+            //System.out.println("Name: " + name + " Type: " + type);
         }
         System.out.println("Get columns from table: " + myDbms.getTableName());
         myDbms.table_list.get(table_index).getColumnNames();
@@ -414,6 +385,24 @@ public class MyRulesBaseListener extends RulesBaseListener {
         System.out.println("Exit Program");
     }
     **/
+
+// USEFUL ONLY FOR SEEING WHAT THE CMD SEES
+
+//        String relationName;
+////        int i = 0;
+////        while (i < children.size()){
+////            if (i == 0){
+////                ParseTree _test = children.get(0);
+////                System.out.println(_test);
+////            }
+////            else {
+////                if (children.get(i).getChildCount() != 0){
+////
+////                }
+////                relationName = children.get(i).getText();
+////                System.out.println(relationName);
+////            }
+////            i++;
 }
 
 

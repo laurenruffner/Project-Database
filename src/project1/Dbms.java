@@ -2,8 +2,6 @@ package project1;
 
 import java.util.ArrayList;
 
-//I need to implement primary id in the create table - Lauren
-
 public class Dbms {
     public ArrayList<Table> table_list;
     public ArrayList<Table> temp_table_list;
@@ -14,7 +12,6 @@ public class Dbms {
         table_list = new ArrayList<>();
         table_names = new ArrayList<>();
         temp_table_list = new ArrayList<>();
-        //primary_id = new ArrayList<>();
     }
 
     //get empty table input with table_num ----- table_list.size()
@@ -26,12 +23,10 @@ public class Dbms {
     public int indexOfTable(String name){
         int index = -1;
         for(int i = 0; i < table_names.size(); i++){
-            //System.out.println("What we are checking: " + table_names.get(i));
             if (name.compareTo(table_names.get(i)) == 0){
                  index = i;
             }
         }
-
         //-1 if the table doesn't exist
         return index;
     }
