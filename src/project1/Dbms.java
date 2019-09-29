@@ -1,6 +1,7 @@
 package project1;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Dbms {
     public ArrayList<Table> table_list;
@@ -31,7 +32,6 @@ public class Dbms {
         return index;
     }
 
-
     public void createTable(String name) {
         String table_name = name;
         Table int1 = new Table(name);
@@ -41,6 +41,27 @@ public class Dbms {
 
     public String getTableName(){
         return table_list.get(table_num).table_name;
+    }
+
+    public void equality(String operand1, String operand2, String table_name){
+        System.out.println("$ " + operand1);
+        System.out.println("$ "+ operand2);
+        System.out.println("$ " + table_name);
+
+        int index_table = indexOfTable(table_name);
+        System.out.println(table_names.get(index_table));
+        int index_column = table_list.get(index_table).getColumnNumber(operand1);
+        System.out.println(table_list.get(index_table).column_name.get(index_column));
+
+        List<Integer> index_list = new ArrayList<>();
+        index_list = table_list.get(index_table).findIndicies(index_column, operand2);
+        System.out.println(index_list);
+
+        for (int i =0; i < index_list.size(); i++){
+            table_list.get(index_table).dataAtIndex(index_list.get(i));
+        }
+
+        //createTable(table_name);
     }
 
 

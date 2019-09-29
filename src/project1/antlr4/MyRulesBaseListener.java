@@ -3,16 +3,104 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.NotNull;
 import project1.Dbms;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MyRulesBaseListener extends RulesBaseListener {
     Dbms myDbms;
     int count_inserts = 0;
+    List<String> ConditionList;
+    Stack<String> OperatorStack;
+    List<String> PostFix;
+
+    //STUFF FOR DIJKSTRA'S SHUNTING YARD ALGORITHM
+    private enum Operator{
+        AND(2), OR(2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1);
+        final int precedence;
+        Operator(int p) { precedence = p; }
+    };
+    private static Map<String, Operator> ops = new HashMap<String, Operator>() {{
+        put("&&", Operator.AND);
+        put("||", Operator.OR);
+        put("==", Operator.EQUALS);
+        put("!=", Operator.NOTEQUALS);
+        put(">", Operator.GREATER);
+        put("<", Operator.LESS);
+        put(">=", Operator.GREATEREQUAL);
+        put("<=", Operator.LESSEQUAL);
+    }};
+
+    private static boolean isHigherPrec(String op, String sub) {
+        System.out.println("Greater" +  (boolean) (ops.get(sub).precedence >= ops.get(op).precedence));
+        return (ops.containsKey(sub) && ops.get(sub).precedence >= ops.get(op).precedence);
+    }
+
+    private void postfix(){
+        for (String condition: ConditionList){
+            System.out.println("Condition: " + condition);
+            System.out.println("Operator Stack: " + OperatorStack);
+            System.out.println("PostFix Form: " + PostFix);
+
+            if (ops.containsKey(condition)){
+                //Higher Precedence Operator going on stack
+                if ( (!OperatorStack.isEmpty()) && isHigherPrec(condition, OperatorStack.peek())){
+                    OperatorStack.push(condition);
+                }
+                // There's no operator in stack
+                else if (OperatorStack.isEmpty()){
+                    OperatorStack.push(condition);
+                }
+                //lower precedence going on stack
+                else {
+                    PostFix.add(OperatorStack.pop());
+                    OperatorStack.push(condition);
+                }
+            }
+            //If Open Parenthesis
+            else if (condition.compareTo("(") == 0){
+                OperatorStack.push(condition);
+            }
+            //If Closed Parenthesis
+            else if (condition.compareTo(")") == 0) {
+                while (!(OperatorStack.peek().compareTo("(") == 0)) {
+                    PostFix.add(OperatorStack.pop());
+                }
+                OperatorStack.pop();
+            }
+            //All other cases
+            else {
+                PostFix.add(condition);
+            }
+        }
+        //The rest of the operators in the stack
+        while (!OperatorStack.isEmpty()){
+            PostFix.add(OperatorStack.pop());
+        }
+    };
+
+    //Recursion that retrieves the leaf nodes
+    private void getLeafNodes(ParseTree node){
+        if(node.getChildCount() == 0){
+            System.out.println(node.getText());
+            if (node.getText().compareTo("\"") != 0){
+                ConditionList.add(node.getText());
+            }
+        }
+        else{
+            for (int i =0; i < node.getChildCount(); i++){
+                ParseTree child = node.getChild(i);
+                getLeafNodes(child);
+            }
+        }
+    }
+
+
 
     //default constructor
     public MyRulesBaseListener() {
         myDbms = new Dbms();
+        ConditionList = new ArrayList<>();
+        OperatorStack = new Stack<String>();
+        PostFix = new ArrayList<>();
     }
 
 
@@ -84,6 +172,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
             }
 
         }
+
         //Prints table not visually aesthetic
         myDbms.table_list.get(table_index).printTable();
 
@@ -167,8 +256,68 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
         System.out.println("Get columns from table: " + myDbms.getTableName());
         myDbms.table_list.get(table_index).getColumnNames();
-
         System.out.println("-------------------end of table creation ------------------");
+    }
+
+
+    @Override public void exitSelection(RulesParser.SelectionContext ctx) {
+        System.out.println("Exit Selection-----------------------");
+        List<ParseTree> children = ctx.children;
+
+        //System.out.println(children.get(2).getText());
+        //System.out.println(children.get(4).getText());
+        String relationName;
+
+        System.out.println(ConditionList);
+        postfix();
+        System.out.println(PostFix);
+        String table_name = children.get(4).getText();
+        System.out.println(table_name);
+        for (int i = 0; i < PostFix.size(); i++){
+            String element = PostFix.get(i);
+            if (element.equals("&&") || element.equals("||")){
+                //tables and more tables
+                continue;
+            }
+            else if(ops.containsKey(PostFix.get(i))){
+                String operand1 = PostFix.get(i-2);
+                String operand2 = PostFix.get(i-1);
+                myDbms.equality(operand1, operand2, table_name);
+            }
+        }
+
+
+    }
+
+
+    @Override public void exitCondition(RulesParser.ConditionContext ctx) {
+        //System.out.println("Exit Condition-----------------------");
+        List<ParseTree> children = ctx.children;
+        //System.out.println(children.size());
+        String relationName;
+        ParseTree condition_node = children.get(0);
+        //System.out.println("Condition Node: " + condition_node.getText());
+        //System.out.println("\n\nStarting getLeafNodes ------------------------------------");
+        getLeafNodes(condition_node);
+        //System.out.println(ConditionList);
+        //System.out.println("Exiting leaf nodes \n\n");
+//        int i = 0;
+//        while (i < children.size()){
+//            if (i == 0){
+//                ParseTree _test = children.get(0);
+//                System.out.println(_test.getText());
+//            }
+//            else {
+//                if (children.get(i).getChildCount() != 0){
+//
+//                }
+//                relationName = children.get(i).getText();
+//                System.out.println(relationName);
+//            }
+//            i++;
+//        }
+
+
     }
 
 /**
@@ -228,6 +377,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         System.out.println("Exit Close Cmd");
     }
 
+
     @Override public void enterWrite_cmd(RulesParser.Write_cmdContext ctx) {
         System.out.println("Enter Write Cmd");
     }
@@ -248,9 +398,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         System.out.println("Enter Condition");
     }
 
-    @Override public void exitCondition(RulesParser.ConditionContext ctx) {
-        System.out.println("Exit Condition");
-    }
 
     @Override public void enterConjunction(RulesParser.ConjunctionContext ctx) {
         System.out.println("Enter Conjunction");
@@ -289,7 +436,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitSelection(RulesParser.SelectionContext ctx) {
-        System.out.println("Exit Selection");
+    System.out.println("Exit Selection");
     }
 
     @Override public void enterProjection(RulesParser.ProjectionContext ctx) {

@@ -1,6 +1,7 @@
 package project1;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Table {
     public String table_name;
@@ -181,6 +182,19 @@ public class Table {
         }
         System.out.println();
     };
+    public List<Object> dataReturn (int index){
+        List<Object> row = new ArrayList<>();
+        for (int j = 0; j < column_name.size(); j++){
+            System.out.print("|" + column_name.get(j) + "|");
+        }
+        System.out.println();
+        for(int i = 0; i < column_name.size(); i ++){
+            row.add(table.get(i).get(index));
+            System.out.print("|" + table.get(i).get(index) + "|");
+        }
+        System.out.println();
+        return row;
+    };
 
     // This returns the index of the column of a specific name.
     // This can be used to pull the column from the table due to both tables having the same indices
@@ -215,8 +229,6 @@ public class Table {
             ArrayList<Integer> arrayInteger = new ArrayList<>();
             table.add(column_num, arrayInteger);
         }
-
-
     }
 
     // takes the column_num and the input (always parsed into a string) and then use boolean to know what to cast an int from string.
@@ -229,6 +241,29 @@ public class Table {
             table.get(column_num).add(input);
         }
     }
+
+    public List<Integer> findIndicies(int column_num, String find){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j =0; j < total_row; j++){
+            try {
+                //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
+                Integer.parseInt(find);
+                if (Integer.valueOf(find) == table.get(column_num).get(j)){
+                    //System.out.println("Same");
+                    index_list.add(j);
+                }
+            }
+            catch (NumberFormatException e) {
+                if (find.compareTo((String) table.get(column_num).get(j)) == 0){
+                    index_list.add(j);
+                    //System.out.println("Same");
+                }
+            }
+        }
+        return index_list;
+    }
+
 
     public void printTable(){
         int total_rows = table.get(0).size();
