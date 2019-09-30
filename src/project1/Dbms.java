@@ -32,6 +32,21 @@ public class Dbms {
         return index;
     }
 
+    public boolean is_duplicate(List<Object> row_table, Table table){
+        int column = table.table.size();
+        int row = table.table.get(0).size();
+        for(int i=0; i < row; i++){
+            List<Object> row_table2= new ArrayList<>();
+            for(int j=0; j < column; j++){
+                row_table2.add(table.table.get(j).get(i));
+            }
+            if (row_table.equals(row_table2)){
+                return true;
+            };
+        }
+        return false;
+    }
+
     public void createTable(String name) {
         String table_name = name;
         Table int1 = new Table(name);
@@ -41,7 +56,7 @@ public class Dbms {
 
     public Table createTempTable() {
         String table_name = "temp" + temp_table;
-        System.out.println("Temp Table Name: " + table_name);
+        //System.out.println("Temp Table Name: " + table_name);
         Table int1 = new Table(table_name);
         temp_table++;
         return int1;
@@ -90,6 +105,49 @@ public class Dbms {
     }
 
     public void oror(){
+        System.out.println("OROR ----------------------------------------");
+        Table temp1 = temp_table_stack.pop();
+        Table temp2 = temp_table_stack.pop();
+
+        temp1.printTable();
+        temp2.printTable();
+
+        create_empty_temp_clone(temp1);
+        Table temp = temp_table_stack.pop();
+        int columns1  = temp1.table.size();
+        int rows1 = temp1.table.get(0).size();
+        int rows2 = temp2.table.get(0).size();
+
+        for (int i=0; i < rows1; i++){
+            List<Object> row_of_temp1 = new ArrayList<>();
+            for (int j=0; j < columns1; j++){
+                row_of_temp1.add(temp1.table.get(j).get(i));
+            }
+            if (is_duplicate(row_of_temp1, temp2) == false){
+                for (int m = 0; m < row_of_temp1.size(); m++) {
+                    if (row_of_temp1.get(m).getClass().getSimpleName().equals("Integer")) {
+                        temp.insertData(m, Integer.toString((Integer) row_of_temp1.get(m)), true);
+                    } else {
+                        temp.insertData(m, (String) row_of_temp1.get(m), false);
+                    }
+                }
+            }
+        }
+        for (int n=0; n < rows2; n++){
+            List<Object> row_of_temp2 = new ArrayList<>();
+            for (int o=0; o < columns1; o++){
+                row_of_temp2.add(temp2.table.get(o).get(n));
+            }
+            for (int p = 0; p < row_of_temp2.size(); p++) {
+                if (row_of_temp2.get(p).getClass().getSimpleName().equals("Integer")) {
+                    temp.insertData(p, Integer.toString((Integer) row_of_temp2.get(p)), true);
+                } else {
+                    temp.insertData(p, (String) row_of_temp2.get(p), false);
+                }
+            }
+        }
+
+        temp.printTable();
 
     }
 
