@@ -1,6 +1,5 @@
 package project1.antlr4;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.jetbrains.annotations.NotNull;
 import project1.Dbms;
 
 import java.util.*;
@@ -30,7 +29,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }};
 
     private static boolean isHigherPrec(String op, String sub) {
-        System.out.println("Greater" +  (boolean) (ops.get(sub).precedence >= ops.get(op).precedence));
+        //System.out.println("Greater" +  (boolean) (ops.get(sub).precedence >= ops.get(op).precedence));
         return (ops.containsKey(sub) && ops.get(sub).precedence >= ops.get(op).precedence);
     }
 
@@ -39,9 +38,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
             PostFix.clear();
         }
         for (String condition: ConditionList){
-            System.out.println("Condition: " + condition);
-            System.out.println("Operator Stack: " + OperatorStack);
-            System.out.println("PostFix Form: " + PostFix);
+            //System.out.println("Condition: " + condition);
+            //System.out.println("Operator Stack: " + OperatorStack);
+            //System.out.println("PostFix Form: " + PostFix);
 
             if (ops.containsKey(condition)){
                 //Higher Precedence Operator going on stack
