@@ -25,7 +25,7 @@ class Main{
         }
         for (String line : lines) {
 
-            // CREATE A FOR LOOK TO ITERATE THROUGH EACH STRING OBJECT
+            // CREATE A FOR LOOP TO ITERATE THROUGH EACH STRING OBJECT
             // WE need to do this
 
             //This sets us the lexer(tokenizer) and parser
