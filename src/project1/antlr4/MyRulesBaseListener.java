@@ -13,7 +13,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     //STUFF FOR DIJKSTRA'S SHUNTING YARD ALGORITHM
     private enum Operator{
-        AND(2), OR( 2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1);
+        AND(2), OR( 2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1),
+        ADD(3), SUBTRACT(3), MULTIPLY(3);
         final int precedence;
         Operator(int p) { precedence = p; }
     };
@@ -26,6 +27,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
         put("<", Operator.LESS);
         put(">=", Operator.GREATEREQUAL);
         put("<=", Operator.LESSEQUAL);
+        put("+", Operator.ADD);
+        put("-", Operator.SUBTRACT);
+        put("*", Operator.MULTIPLY);
     }};
 
     private static boolean isHigherPrec(String op, String sub) {
