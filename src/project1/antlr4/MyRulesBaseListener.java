@@ -14,7 +14,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     //STUFF FOR DIJKSTRA'S SHUNTING YARD ALGORITHM
     private enum Operator{
-        AND(2), OR( 2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1);
+        AND(2), OR( 2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1),
+        ADD(3), SUBTRACT(3), MULTIPLY(3);
         final int precedence;
         Operator(int p) { precedence = p; }
     };
@@ -27,6 +28,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
         put("<", Operator.LESS);
         put(">=", Operator.GREATEREQUAL);
         put("<=", Operator.LESSEQUAL);
+        put("+", Operator.ADD);
+        put("-", Operator.SUBTRACT);
+        put("*", Operator.MULTIPLY);
     }};
 
     private static boolean isHigherPrec(String op, String sub) {
@@ -230,6 +234,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
         int count = 0;
         String name = null;
 
+
+
         while (i < children_num) {
             if (count == 0) {
                 name = new_tree.getChild(i).getText();
@@ -264,12 +270,35 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
 
     @Override public void exitSelection(RulesParser.SelectionContext ctx) {
-        System.out.println("Exit Selection-----------------------");
+        //System.out.println("Exit Selection-----------------------");
         List<ParseTree> children = ctx.children;
 
         //System.out.println(children.get(2).getText());
+        //System.out.println(children.get(2).getChild(0).getText());
         //System.out.println(children.get(4).getText());
-        String relationName;
+        //String relationName;
+//        int pp = 0;
+//        while (pp < children.size()){
+//            if (pp == 0){
+//                ParseTree _test = children.get(0);
+//                System.out.println(_test);
+//            }
+//            else {
+//                if (children.get(pp).getChildCount() != 0){
+//
+//                }
+//                relationName = children.get(pp).getText();
+//                System.out.println(relationName);
+//            }
+//            pp++;
+//        }
+
+        //String relationName = children.get(1).getText();
+
+        //System.out.println(relationName);
+
+        //dbms.getTable(relationName);
+
 
         System.out.println(ConditionList);
         postfix();
@@ -278,22 +307,22 @@ public class MyRulesBaseListener extends RulesBaseListener {
         System.out.println(table_name);
         for (int i = 0; i < PostFix.size(); i++){
             String element = PostFix.get(i);
-            System.out.println("Element: " + element );
+            //System.out.println("Element: " + element );
             if (element.equals("&&") || element.equals("||")){
                 //tables and more tables
                 if (element.equals("&&")){
                     myDbms.andand();
                 }
                 else{
-                    //myDbms.oror();
+                    myDbms.oror();
                 }
                 continue;
             }
             else if(ops.containsKey(PostFix.get(i))){
                 String operand1 = PostFix.get(i-2);
                 String operand2 = PostFix.get(i-1);
-                System.out.println("Operand1: " + operand1);
-                System.out.println("Operand2: " + operand2);
+                //System.out.println("Operand1: " + operand1);
+                //System.out.println("Operand2: " + operand2);
                 if (element.equals("==")) {
                     myDbms.equality(operand1, operand2, table_name);
                 }
@@ -324,10 +353,17 @@ public class MyRulesBaseListener extends RulesBaseListener {
         List<ParseTree> children = ctx.children;
         //System.out.println(children.size());
         String relationName;
-        ParseTree condition_node = children.get(0);
-        //System.out.println("Condition Node: " + condition_node.getText());
-        //System.out.println("\n\nStarting getLeafNodes ------------------------------------");
-        getLeafNodes(condition_node);
+        if (children.size() >  1){
+            for (int i=0; i < children.size(); i++){
+                getLeafNodes(children.get(i));
+            }
+        }
+        else {
+            ParseTree condition_node = children.get(0);
+            //System.out.println("Condition Node: " + condition_node.getText());
+            //System.out.println("\n\nStarting getLeafNodes ------------------------------------");
+            getLeafNodes(condition_node);
+        }
         //System.out.println(ConditionList);
         //System.out.println("Exiting leaf nodes \n\n");
 
