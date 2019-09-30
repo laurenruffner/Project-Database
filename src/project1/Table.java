@@ -256,6 +256,61 @@ public class Table {
         return index_list;
     }
 
+    public List<Integer> findIndiciesCompare(int column_num, String find, String op){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j = 0; j < total_row; j++){
+            try { //is integer
+                Integer.parseInt(find);
+                if (op.equals(">=")){
+                    if ((Integer)(table.get(column_num).get(j)) >= Integer.valueOf(find) ) {
+                        index_list.add(j);
+                    }
+                }
+                else if (op.equals("<=")) {
+                    if ((Integer)(table.get(column_num).get(j)) <= Integer.valueOf(find) ) {
+                        index_list.add(j);
+                    }
+                }
+                else if (op.equals(">")) {
+                    if ((Integer)(table.get(column_num).get(j)) > Integer.valueOf(find) ) {
+                        index_list.add(j);
+                    }
+                }
+                else if (op.equals("<")) {
+                    if ((Integer)(table.get(column_num).get(j)) < Integer.valueOf(find) ) {
+                        index_list.add(j);
+                    }
+                }
+            }
+            catch (NumberFormatException e) { //is string
+                if (op.equals(">=")){
+                    System.out.println(">= string");
+                    System.out.println(find.compareTo((String) table.get(column_num).get(j)));
+                    if (find.compareTo((String) table.get(column_num).get(j)) <= 0){
+                        index_list.add(j);
+                    }
+                }
+                else if (op.equals("<=")) {
+                    if (find.compareTo((String) table.get(column_num).get(j)) >= 0){
+                        index_list.add(j);
+                    }
+                }
+                else if (op.equals(">")) {
+                    if (find.compareTo((String) table.get(column_num).get(j)) < 0){
+                        index_list.add(j);
+                    }
+                }
+                else if (op.equals("<")) {
+                    if (find.compareTo((String) table.get(column_num).get(j)) > 0){
+                        index_list.add(j);
+                    }
+                }
+            }
+        }
+        return index_list;
+    }
+
 
     public void printTable(){
         int total_rows = table.get(0).size();
