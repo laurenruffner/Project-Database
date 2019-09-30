@@ -16,13 +16,16 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 class Main{
     public static void main(String[] args) throws FileNotFoundException {
-        File file = new File("src/project1/input.txt");
+        File file = new File("src/project1/input2.txt");
         Scanner scanner = new Scanner(file);
         List<String> lines = new ArrayList<>();
+
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             if (line.length() != 0) { lines.add(line); }
         }
+
+        MyRulesBaseListener listener = new MyRulesBaseListener();
         for (String line : lines) {
 
             // CREATE A FOR LOOP TO ITERATE THROUGH EACH STRING OBJECT
@@ -41,7 +44,9 @@ class Main{
             //This creates the parse tree listener and  the parse tree walker
             RulesParser.ProgramContext programContext = parser.program();
             ParseTreeWalker walker = new ParseTreeWalker();
-            MyRulesBaseListener listener = new MyRulesBaseListener();
+
+            //This calls this thing over and over and over
+//            MyRulesBaseListener listener = new MyRulesBaseListener();
             walker.walk(listener, programContext);
 
 
