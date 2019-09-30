@@ -287,6 +287,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 if (element.equals("==")) {
                     myDbms.equality(operand1, operand2, table_name);
                 }
+                else if (element.equals("!=")) {
+                    myDbms.not_equality(operand1, operand2, table_name);
+                }
             }
         }
 
