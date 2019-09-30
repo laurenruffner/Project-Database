@@ -300,6 +300,18 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 else if (element.equals(">")) {
                     myDbms.greater(operand1, operand2, table_name);
                 }
+                else if (element.equals(">=")) {
+                    myDbms.compares(operand1, operand2, element, table_name);
+                }
+                else if (element.equals("<=")) {
+                    myDbms.compares(operand1, operand2, element, table_name);
+                }
+                else if (element.equals(">")) {
+                    myDbms.compares(operand1, operand2, element, table_name);
+                }
+                else if (element.equals("<")) {
+                    myDbms.compares(operand1, operand2, element, table_name);
+                }
             }
         }
 

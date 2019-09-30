@@ -172,6 +172,30 @@ public class Dbms {
         //temp_table_stack.get(0).printTable();
     }
 
+    public void compares(String operand1, String operand2, String operator, String table_name){
+        int index_table = indexOfTable(table_name);
+        int index_column = table_list.get(index_table).getColumnNumber(operand1);
+        List<Integer> index_list = new ArrayList<>();
+        index_list = table_list.get(index_table).findIndiciesCompare(index_column, operand2, operator);
+        create_empty_temp_clone(table_list.get(index_table));
+        Table temp = temp_table_stack.pop();
+        for (int i =0; i < index_list.size(); i++){
+            for (int j = 0; j <  table_list.get(index_table).table.size(); j++){  //gives you the column size
+                if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")){ //integer
+                    int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                    temp.insertData(j,Integer.toString(data),true);
+                }
+                else{ //string
+                    String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                    temp.insertData(j,data,false);
+                }
+            }
+        }
+        //temp.printTable();
+        temp_table_stack.push(temp);
+        //temp_table_stack.get(0).printTable();
+    }
+
     public Table clone_table(Table table){
             //System.out.println("Column Names to duplicate: ");
             //table.getColumnNames();
