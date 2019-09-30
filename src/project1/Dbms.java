@@ -47,13 +47,50 @@ public class Dbms {
         return int1;
     }
 
-// ******************* Natalie **************************************
-    public void greater(String operand1, String operand2, String table_name) {
-        System.out.println("$ " + operand1);
-        System.out.println("$ "+ operand2);
-        System.out.println("$ " + table_name);
-        int index_table = indexOfTable(table_name);
-        int index_column = table_list.get(index_table).getColumnNumber(operand1);
+    public void andand(){
+        //System.out.println("IN ANDAND");
+        Table temp1 = temp_table_stack.pop();
+        Table temp2 = temp_table_stack.pop();
+        //temp1.printTable();
+        //temp2.printTable();
+        create_empty_temp_clone(temp1);
+        Table temp = temp_table_stack.pop();
+        int columns1  = temp1.table.size();
+        int rows1 = temp1.table.get(0).size();
+        int rows2 = temp2.table.get(0).size();
+
+        //System.out.println("Columns: " + columns1 + " Rows: " +  rows1);
+        for (int i = 0; i <  rows1; i++) {
+
+            List<Object> temp1_row = new ArrayList();
+            for (int j = 0; j < columns1; j++) {
+                temp1_row.add(temp1.table.get(j).get(i));
+                //System.out.println(temp1_row);
+            }
+            for (int k = 0; k < rows2; k++) {
+                List<Object> temp2_row = new ArrayList();
+                for (int l = 0; l < columns1; l++) {
+                    temp2_row.add(temp2.table.get(l).get(k));
+                    //System.out.println(temp1_row);
+                }
+                //System.out.println("Temp1: " + temp1_row + " Temp2: " + temp2_row);
+                if (temp1_row.equals(temp2_row)) {
+                    for (int m = 0; m < temp1_row.size(); m++) {
+                        if (temp1_row.get(m).getClass().getSimpleName().equals("Integer")) {
+                            temp.insertData(m, Integer.toString((Integer) temp1_row.get(m)), true);
+                        } else {
+                            temp.insertData(m, (String) temp1_row.get(m), false);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        temp_table_stack.push(temp);
+    }
+
+    public void oror(){
+
     }
 
 
@@ -93,7 +130,7 @@ public class Dbms {
         }
         //temp.printTable();
         temp_table_stack.push(temp);
-        temp_table_stack.get(0).printTable();
+        //temp_table_stack.get(0).printTable();
     }
     public void not_equality(String operand1, String operand2, String table_name){
 //        System.out.println("$ " + operand1);
@@ -130,7 +167,7 @@ public class Dbms {
             }
             //table_list.get(index_table).dataAtIndex(index_list.get(i));
         }
-        //temp.printTable();
+        temp.printTable();
         temp_table_stack.push(temp);
         //temp_table_stack.get(0).printTable();
     }
@@ -148,13 +185,13 @@ public class Dbms {
                     temp.enterColumns(i,table.column_name.get(i), "VARCHAR");
                 }
                 else{
-                    System.out.println("Column is integer");
+                    //System.out.println("Column is integer");
                     temp.enterColumns(i,table.column_name.get(i), "INTEGER");
                 }
                 //Integer.parseInt(table.table.get(i).get(0));
             }
 
-        System.out.println("Current Column Names in temp: ");
+        //System.out.println("Current Column Names in temp: ");
         //temp.getColumnNames();
         int columns = table.table.size();
         int rows = table.table.get(0).size();
@@ -192,12 +229,13 @@ public class Dbms {
                 //System.out.println("Column is a string");
                 temp.enterColumns(i, table.column_name.get(i), "VARCHAR");
             } else {
-                System.out.println("Column is integer");
+                //System.out.println("Column is integer");
                 temp.enterColumns(i, table.column_name.get(i), "INTEGER");
             }
         }
         temp_table_stack.push(temp);
     }
+
 
 }
 

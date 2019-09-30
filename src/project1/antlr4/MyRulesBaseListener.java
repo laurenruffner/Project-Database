@@ -278,13 +278,22 @@ public class MyRulesBaseListener extends RulesBaseListener {
         System.out.println(table_name);
         for (int i = 0; i < PostFix.size(); i++){
             String element = PostFix.get(i);
+            System.out.println("Element: " + element );
             if (element.equals("&&") || element.equals("||")){
                 //tables and more tables
+                if (element.equals("&&")){
+                    myDbms.andand();
+                }
+                else{
+                    //myDbms.oror();
+                }
                 continue;
             }
             else if(ops.containsKey(PostFix.get(i))){
                 String operand1 = PostFix.get(i-2);
                 String operand2 = PostFix.get(i-1);
+                System.out.println("Operand1: " + operand1);
+                System.out.println("Operand2: " + operand2);
                 if (element.equals("==")) {
                     myDbms.equality(operand1, operand2, table_name);
                 }
