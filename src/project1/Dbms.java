@@ -146,9 +146,7 @@ public class Dbms {
                 }
             }
         }
-
-        temp.printTable();
-
+        temp_table_stack.push(temp);
     }
 
 
