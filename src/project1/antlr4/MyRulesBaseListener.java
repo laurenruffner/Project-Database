@@ -1,6 +1,5 @@
 package project1.antlr4;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.jetbrains.annotations.NotNull;
 import project1.Dbms;
 
 import java.util.*;
