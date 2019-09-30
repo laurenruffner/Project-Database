@@ -47,6 +47,16 @@ public class Dbms {
         return int1;
     }
 
+// ******************* Natalie **************************************
+    public void greater(String operand1, String operand2, String table_name) {
+        System.out.println("$ " + operand1);
+        System.out.println("$ "+ operand2);
+        System.out.println("$ " + table_name);
+        int index_table = indexOfTable(table_name);
+        int index_column = table_list.get(index_table).getColumnNumber(operand1);
+    }
+
+
     public void equality(String operand1, String operand2, String table_name){
 //        System.out.println("$ " + operand1);
 //        System.out.println("$ "+ operand2);

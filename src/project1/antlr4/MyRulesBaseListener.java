@@ -1,4 +1,5 @@
 package project1.antlr4;
+
 import org.antlr.v4.runtime.tree.ParseTree;
 import project1.Dbms;
 
@@ -287,8 +288,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 if (element.equals("==")) {
                     myDbms.equality(operand1, operand2, table_name);
                 }
-                else if (element.equals("!=")) {
-                    myDbms.not_equality(operand1, operand2, table_name);
+                else if (element.equals(">")) {
+                    myDbms.greater(operand1, operand2, table_name);
                 }
             }
         }

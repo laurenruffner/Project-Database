@@ -212,6 +212,18 @@ public class Table {
             table.get(column_num).add(input);
         }
     }
+    public List<Integer> findGreaterThanIndicies(int column_num, int find) {
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for (int j = 0; j < total_row; j++) {
+                //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
+                if (find > Integer.parseInt((String) table.get(column_num).get(j))) {
+                    System.out.println("comparing to find" + Integer.parseInt((String) table.get(column_num).get(j)));
+                    index_list.add(j);
+                }
+        }
+        return index_list;
+    }
 
     public List<Integer> findIndicies(int column_num, String find){
         List<Integer> index_list = new ArrayList<>();
