@@ -234,6 +234,27 @@ public class Table {
         }
         return index_list;
     }
+    public List<Integer> findAllButIndicies(int column_num, String find){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j =0; j < total_row; j++){
+            try {
+                //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
+                Integer.parseInt(find);
+                if (Integer.valueOf(find) != table.get(column_num).get(j)){
+                    //System.out.println("Same");
+                    index_list.add(j);
+                }
+            }
+            catch (NumberFormatException e) {
+                if (find.compareTo((String) table.get(column_num).get(j)) != 0){
+                    index_list.add(j);
+                    //System.out.println("Same");
+                }
+            }
+        }
+        return index_list;
+    }
 
 
     public void printTable(){
