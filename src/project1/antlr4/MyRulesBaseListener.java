@@ -14,7 +14,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     //STUFF FOR DIJKSTRA'S SHUNTING YARD ALGORITHM
     private enum Operator{
-        AND(2), OR(2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1);
+        AND(2), OR( 2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1);
         final int precedence;
         Operator(int p) { precedence = p; }
     };
@@ -35,6 +35,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     private void postfix(){
+        if(!PostFix.isEmpty()){
+            PostFix.clear();
+        }
         for (String condition: ConditionList){
             System.out.println("Condition: " + condition);
             System.out.println("Operator Stack: " + OperatorStack);
@@ -195,7 +198,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
         myDbms.createTable(table_name);
-        myDbms.getTableName();
+        //myDbms.getTableName();
 
         //This fills the Primary Key into the ArrayList of strings called Primary ID
 
@@ -254,8 +257,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
             i++;
             //System.out.println("Name: " + name + " Type: " + type);
         }
-        System.out.println("Get columns from table: " + myDbms.getTableName());
-        myDbms.table_list.get(table_index).getColumnNames();
+        //System.out.println("Get columns from table: " + myDbms.getTableName());
+       // myDbms.table_list.get(table_index).getColumnNames();
         System.out.println("-------------------end of table creation ------------------");
     }
 
@@ -282,7 +285,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
             else if(ops.containsKey(PostFix.get(i))){
                 String operand1 = PostFix.get(i-2);
                 String operand2 = PostFix.get(i-1);
-                myDbms.equality(operand1, operand2, table_name);
+                if (element.equals("==")) {
+                    myDbms.equality(operand1, operand2, table_name);
+                }
             }
         }
 
@@ -301,22 +306,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         getLeafNodes(condition_node);
         //System.out.println(ConditionList);
         //System.out.println("Exiting leaf nodes \n\n");
-//        int i = 0;
-//        while (i < children.size()){
-//            if (i == 0){
-//                ParseTree _test = children.get(0);
-//                System.out.println(_test.getText());
-//            }
-//            else {
-//                if (children.get(i).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(i).getText();
-//                System.out.println(relationName);
-//            }
-//            i++;
-//        }
-
 
     }
 
