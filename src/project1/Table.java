@@ -138,35 +138,6 @@ public class Table {
 
         }
 
-//        for (int i = 0; i < primary_id.size(); i++){
-//            int column_num = getColumnNumber(primary_id.get(i));
-//            for(int j =0; j < total_row; j++){
-//                try {
-//                    System.out.println("Comparing: " + search.get(i));
-//                    System.out.println("To: " + table.get(column_num).get(row));
-//                    Integer.parseInt(search.get(i));
-//                    if (Integer.valueOf(search.get(i)) == table.get(column_num).get(row)){
-//
-//                        System.out.println("Same");
-//                        column++;
-//                    }
-//                    else{
-//                        System.out.println("Not Same");
-//                        row++;
-//                    }
-//                }
-//                catch (NumberFormatException e) {
-//                    if (search.get(i).compareTo((String) table.get(column_num).get(row)) == 0){
-//                        column++;
-//                    }
-//                    else{
-//                        row++;
-//                    }
-//                }
-//            }
-//
-//        }
-
         System.out.println("Exit");
         return row;
     }
