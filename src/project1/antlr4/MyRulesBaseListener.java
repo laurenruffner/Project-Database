@@ -1,6 +1,7 @@
 package project1.antlr4;
 import org.antlr.v4.runtime.tree.ParseTree;
 import project1.Dbms;
+import project1.Table;
 
 import java.util.*;
 
@@ -234,7 +235,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         String name = null;
 
 
-
         while (i < children_num) {
             if (count == 0) {
                 name = new_tree.getChild(i).getText();
@@ -271,33 +271,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     @Override public void exitSelection(RulesParser.SelectionContext ctx) {
         //System.out.println("Exit Selection-----------------------");
         List<ParseTree> children = ctx.children;
-
-        //System.out.println(children.get(2).getText());
-        //System.out.println(children.get(2).getChild(0).getText());
-        //System.out.println(children.get(4).getText());
-        //String relationName;
-//        int pp = 0;
-//        while (pp < children.size()){
-//            if (pp == 0){
-//                ParseTree _test = children.get(0);
-//                System.out.println(_test);
-//            }
-//            else {
-//                if (children.get(pp).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(pp).getText();
-//                System.out.println(relationName);
-//            }
-//            pp++;
-//        }
-
-        //String relationName = children.get(1).getText();
-
-        //System.out.println(relationName);
-
-        //dbms.getTable(relationName);
-
 
         System.out.println(ConditionList);
         postfix();
@@ -365,7 +338,89 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
         //System.out.println(ConditionList);
         //System.out.println("Exiting leaf nodes \n\n");
+    }
 
+    @Override public void exitProjection(RulesParser.ProjectionContext ctx) {
+        //System.out.println("Exit Projection--------------");
+        List<ParseTree> children = ctx.children;
+        ParseTree new_tree = children.get(2);
+        int children_num = children.get(2).getChildCount();
+        System.out.println(children.get(4).getText());
+
+        Table temp = myDbms.createTempTable();
+
+        int count = 0;
+        int column_number = 0;
+        //AKA  IT IS AN EXISTING TABLE NOT A JUNK VARIABLE
+        if(myDbms.indexOfTable(children.get(4).getText()) != -1){
+            int table_index = myDbms.indexOfTable(children.get(4).getText());
+            myDbms.table_list.get(table_index).printTable();
+            for (int i =0; i < children_num; i++) {
+                if (count == 0) {
+                    String column = new_tree.getChild(i).getText();
+                    //System.out.println(column);
+                    int column_num = myDbms.table_list.get(table_index).getColumnNumber(column);
+                    if (myDbms.table_list.get(table_index).table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")) {
+                        //System.out.println("Integer Column");
+                        temp.enterColumns(column_number,column, "INTEGER");
+                        for (int j=0; j < myDbms.table_list.get(table_index).table.get(column_num).size(); j++){
+                            temp.insertData(column_number, Integer.toString((Integer) myDbms.table_list.get(table_index).table.get(column_num).get(j)), true);
+                        }
+                        column_number++;
+                    }
+                    else{
+                        temp.enterColumns(column_number, column, "VARCHAR");
+                        for (int k=0; k < myDbms.table_list.get(table_index).table.get(column_num).size(); k++){
+                            temp.insertData(column_number, (String) myDbms.table_list.get(table_index).table.get(column_num).get(k), false);
+                        }
+                        column_number++;
+                    }
+                    count++;
+                }
+                else if (count == 1 && new_tree.getChild(i).getText().equals(",")){
+                    count = 0;
+                }
+            }
+            //System.out.println("The project was of a table that exists");
+            //temp.printTable();
+            //System.out.println("The project was of a table that exists");
+            myDbms.temp_table_stack.push(temp);
+        }
+        //temp.printTable();
+        else{
+            Table table = myDbms.temp_table_stack.pop();
+            Table temp2 = myDbms.createTempTable();
+            int count2 = 0;
+            int column_number2 = 0;
+            for (int i = 0; i < children_num; i++){
+                if (count2 == 0){
+                    String column = new_tree.getChild(i).getText();
+                    System.out.println(column);
+                    int column_num = table.getColumnNumber(column);
+                    if (table.table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")){
+                        temp2.enterColumns(column_number2,column, "INTEGER");
+                        for (int j = 0; j < table.table.get(column_num).size(); j++){
+                            temp2.insertData(column_number2, Integer.toString((Integer) table.table.get(column_num).get(j)), true);
+                        }
+                        column_number2++;
+                    }
+                    else{
+                        temp2.enterColumns(column_number2, column, "VARCHAR");
+                        for (int k =0; k< table.table.get(column_num).size(); k++){
+                            temp2.insertData(column_number2, (String) table.table.get(column_num).get(k), false);
+                        }
+                        column_number2++;
+                    }
+                    count2 ++;
+                }
+                else if (count2 == 1 && new_tree.getChild(i).getText().equals(",")){
+                    count2 = 0;
+                }
+            }
+            //System.out.println("The project was of a temp table");
+            //temp2.printTable();
+            myDbms.temp_table_stack.push(temp2);
+        }
     }
 
 /**
