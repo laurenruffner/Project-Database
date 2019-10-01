@@ -2,6 +2,7 @@ package project1.antlr4;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 import project1.Dbms;
+import project1.Table;
 
 import java.util.*;
 
@@ -87,7 +88,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     //Recursion that retrieves the leaf nodes
     private void getLeafNodes(ParseTree node){
         if(node.getChildCount() == 0){
-            System.out.println(node.getText());
+            //System.out.println(node.getText());
             if (node.getText().compareTo("\"") != 0){
                 ConditionList.add(node.getText());
             }
@@ -112,47 +113,29 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
 
 
-//    @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx){
-//        //System.out.println(ctx);
-//        //System.out.println ("SHOW");
-//        List<ParseTree> children = ctx.children;
-//        //System.out.println(children.size());
-//
-//        //ParseTree _test = children.get(0);  //Ignore
-//
-//        String relationName;
-//        int i = 0;
-//        while (i < children.size()){
-//            if (i == 0){
-//                ParseTree _test = children.get(0);
-//                //System.out.println(_test);
-//            }
-//            else {
-//                if (children.get(i).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(i).getText();
-//                //System.out.println(relationName);
-//            }
-//            i++;
-//        }
-//
-//        //String relationName = children.get(1).getText();
-//
-//        //System.out.println(relationName);
-//
-//        //dbms.getTable(relationName);
-//
-//    }
+   @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx){
+        System.out.println("***********************************SHOW CMD********************************************");
+        List<ParseTree> children = ctx.children;
+        String table_name = children.get(1).getText();
+
+        if(myDbms.indexOfTable(table_name) != -1){
+           int index = myDbms.indexOfTable(table_name);
+           myDbms.table_list.get(index).printTable();
+        }
+        else{
+           Table table = myDbms.temp_table_stack.pop();
+           table.printTable();
+        }
+    }
 
     @Override public void exitInsert_cmd(RulesParser.Insert_cmdContext ctx) {
         //CURRENTLY DOES NOTHING WITH THE SECOND CASE OF INSERT JUST DEALS WITH CREATING THE TABLES
 
-        System.out.println("**********************************INSERT CMD**************************************");
+        //System.out.println("**********************************INSERT CMD**************************************");
         count_inserts++;
         List<ParseTree> children = ctx.children;
         int children_size = children.size();
-        System.out.println("Table Name: " + children.get(1).getText());
+        //System.out.println("Table Name: " + children.get(1).getText());
         int table_index = myDbms.indexOfTable(children.get(1).getText());
         int count = 0;
 
@@ -162,14 +145,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
             boolean isInteger;
             String data;
             while (i <  (children_size-1)){
-
                 if (children.get(i).getText().compareTo(",") == 0){
                     count++;
                 }
                 else if(children.get(i).getChild(0).getChildCount() >  1) {
                     data = children.get(i).getChild(0).getChild(1).getText();
                     myDbms.table_list.get(table_index).insertData(count, data, false);
-
                 }
                 else{
                     data = children.get(i).getChild(0).getText();
@@ -179,18 +160,40 @@ public class MyRulesBaseListener extends RulesBaseListener {
             }
 
         }
+        else{
+            // table_index -> index of the table inserting into
+            // table is the table that we are taking the data from
+            //System.out.println(myDbms.table_names.get(table_index));
+            Table table = myDbms.temp_table_stack.pop();
+            int table_columns = table.table.size();
+            int table_rows = table.table.get(0).size();
+            for (int i = 0; i < table_columns; i++){
+                int copy_into_column_index = myDbms.table_list.get(table_index).getColumnNumber(table.column_name.get(i));
+                for (int j=0; j < table_rows; j++){
+                    if(table.table.get(i).get(j).getClass().getSimpleName().equals("Integer")){
+                        myDbms.table_list.get(table_index).insertData(copy_into_column_index, Integer.toString((Integer) table.table.get(i).get(j)), true);
+                    }
+                    else{
+                        myDbms.table_list.get(table_index).insertData(copy_into_column_index, (String) table.table.get(i).get(j), false);
+                    }
+                }
+            }
+
+            //myDbms.table_list.get(table_index).printTable();
+        }
 
         //Prints table not visually aesthetic
-        myDbms.table_list.get(table_index).printTable();
+        //myDbms.table_list.get(table_index).printTable();
+
 
         //TEST TO FIND PRIMARY ID Info -- It works
-        if (count_inserts > 4) {
-            ArrayList<String> Primary_test = new ArrayList<>();
-            Primary_test.add("Tweety");
-            Primary_test.add("bird");
-            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
-            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
-        }
+//        if (count_inserts > 4) {
+//            ArrayList<String> Primary_test = new ArrayList<>();
+//            Primary_test.add("Tweety");
+//            Primary_test.add("bird");
+//            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
+//            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
+//        }
     }
 
 
@@ -235,7 +238,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         String name = null;
 
 
-
         while (i < children_num) {
             if (count == 0) {
                 name = new_tree.getChild(i).getText();
@@ -263,48 +265,21 @@ public class MyRulesBaseListener extends RulesBaseListener {
             i++;
             //System.out.println("Name: " + name + " Type: " + type);
         }
-        //System.out.println("Get columns from table: " + myDbms.getTableName());
-       // myDbms.table_list.get(table_index).getColumnNames();
-        System.out.println("-------------------end of table creation ------------------");
+        //System.out.println("Get columns from table: " + myDbms.table_names.get(table_index));
+        //myDbms.table_list.get(table_index).getColumnNames();
+        //System.out.println("-------------------end of table creation ------------------");
     }
 
 
     @Override public void exitSelection(RulesParser.SelectionContext ctx) {
-        //System.out.println("Exit Selection-----------------------");
+        //System.out.println("*************************SELECT********************************");
         List<ParseTree> children = ctx.children;
 
-        //System.out.println(children.get(2).getText());
-        //System.out.println(children.get(2).getChild(0).getText());
-        //System.out.println(children.get(4).getText());
-        //String relationName;
-//        int pp = 0;
-//        while (pp < children.size()){
-//            if (pp == 0){
-//                ParseTree _test = children.get(0);
-//                System.out.println(_test);
-//            }
-//            else {
-//                if (children.get(pp).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(pp).getText();
-//                System.out.println(relationName);
-//            }
-//            pp++;
-//        }
-
-        //String relationName = children.get(1).getText();
-
-        //System.out.println(relationName);
-
-        //dbms.getTable(relationName);
-
-
-        System.out.println(ConditionList);
+        //System.out.println(ConditionList);
         postfix();
-        System.out.println(PostFix);
+        //System.out.println(PostFix);
         String table_name = children.get(4).getText();
-        System.out.println(table_name);
+        //System.out.println(table_name);
         for (int i = 0; i < PostFix.size(); i++){
             String element = PostFix.get(i);
             //System.out.println("Element: " + element );
@@ -366,7 +341,88 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
         //System.out.println(ConditionList);
         //System.out.println("Exiting leaf nodes \n\n");
+    }
 
+    @Override public void exitProjection(RulesParser.ProjectionContext ctx) {
+        //System.out.println("Exit Projection--------------");
+        List<ParseTree> children = ctx.children;
+        ParseTree new_tree = children.get(2);
+        int children_num = children.get(2).getChildCount();
+        //System.out.println(children.get(4).getText());
+
+        Table temp = myDbms.createTempTable();
+
+        int count = 0;
+        int column_number = 0;
+        //AKA  IT IS AN EXISTING TABLE NOT A JUNK VARIABLE
+        if(myDbms.indexOfTable(children.get(4).getText()) != -1){
+            int table_index = myDbms.indexOfTable(children.get(4).getText());
+            //myDbms.table_list.get(table_index).printTable();
+            for (int i =0; i < children_num; i++) {
+                if (count == 0) {
+                    String column = new_tree.getChild(i).getText();
+                    //System.out.println(column);
+                    int column_num = myDbms.table_list.get(table_index).getColumnNumber(column);
+                    if (myDbms.table_list.get(table_index).table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")) {
+                        //System.out.println("Integer Column");
+                        temp.enterColumns(column_number,column, "INTEGER");
+                        for (int j=0; j < myDbms.table_list.get(table_index).table.get(column_num).size(); j++){
+                            temp.insertData(column_number, Integer.toString((Integer) myDbms.table_list.get(table_index).table.get(column_num).get(j)), true);
+                        }
+                        column_number++;
+                    }
+                    else{
+                        temp.enterColumns(column_number, column, "VARCHAR");
+                        for (int k=0; k < myDbms.table_list.get(table_index).table.get(column_num).size(); k++){
+                            temp.insertData(column_number, (String) myDbms.table_list.get(table_index).table.get(column_num).get(k), false);
+                        }
+                        column_number++;
+                    }
+                    count++;
+                }
+                else if (count == 1 && new_tree.getChild(i).getText().equals(",")){
+                    count = 0;
+                }
+            }
+            //System.out.println("The project was of a table that exists");
+            //temp.printTable();
+            myDbms.temp_table_stack.push(temp);
+        }
+        //temp.printTable();
+        else{
+            Table table = myDbms.temp_table_stack.pop();
+            Table temp2 = myDbms.createTempTable();
+            int count2 = 0;
+            int column_number2 = 0;
+            for (int i = 0; i < children_num; i++){
+                if (count2 == 0){
+                    String column = new_tree.getChild(i).getText();
+                    //System.out.println(column);
+                    int column_num = table.getColumnNumber(column);
+                    if (table.table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")){
+                        temp2.enterColumns(column_number2,column, "INTEGER");
+                        for (int j = 0; j < table.table.get(column_num).size(); j++){
+                            temp2.insertData(column_number2, Integer.toString((Integer) table.table.get(column_num).get(j)), true);
+                        }
+                        column_number2++;
+                    }
+                    else{
+                        temp2.enterColumns(column_number2, column, "VARCHAR");
+                        for (int k =0; k< table.table.get(column_num).size(); k++){
+                            temp2.insertData(column_number2, (String) table.table.get(column_num).get(k), false);
+                        }
+                        column_number2++;
+                    }
+                    count2 ++;
+                }
+                else if (count2 == 1 && new_tree.getChild(i).getText().equals(",")){
+                    count2 = 0;
+                }
+            }
+            //System.out.println("The project was of a temp table");
+            //temp2.printTable();
+            myDbms.temp_table_stack.push(temp2);
+        }
     }
 
 /**

@@ -138,7 +138,7 @@ public class Table {
 
         }
 
-        System.out.println("Exit");
+        //System.out.println("Exit");
         return row;
     }
 
@@ -297,8 +297,8 @@ public class Table {
             }
             catch (NumberFormatException e) { //is string
                 if (op.equals(">=")){
-                    System.out.println(">= string");
-                    System.out.println(find.compareTo((String) table.get(column_num).get(j)));
+                    //System.out.println(">= string");
+                    //System.out.println(find.compareTo((String) table.get(column_num).get(j)));
                     if (find.compareTo((String) table.get(column_num).get(j)) <= 0){
                         index_list.add(j);
                     }
