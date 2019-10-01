@@ -179,18 +179,40 @@ public class MyRulesBaseListener extends RulesBaseListener {
             }
 
         }
+        else{
+            // table_index -> index of the table inserting into
+            // table is the table that we are taking the data from
+            System.out.println(myDbms.table_names.get(table_index));
+            Table table = myDbms.temp_table_stack.pop();
+            int table_columns = table.table.size();
+            int table_rows = table.table.get(0).size();
+            for (int i = 0; i < table_columns; i++){
+                int copy_into_column_index = myDbms.table_list.get(table_index).getColumnNumber(table.column_name.get(i));
+                for (int j=0; j < table_rows; j++){
+                    if(table.table.get(i).get(j).getClass().getSimpleName().equals("Integer")){
+                        myDbms.table_list.get(table_index).insertData(copy_into_column_index, Integer.toString((Integer) table.table.get(i).get(j)), true);
+                    }
+                    else{
+                        myDbms.table_list.get(table_index).insertData(copy_into_column_index, (String) table.table.get(i).get(j), false);
+                    }
+                }
+            }
+
+            myDbms.table_list.get(table_index).printTable();
+        }
 
         //Prints table not visually aesthetic
         myDbms.table_list.get(table_index).printTable();
 
+
         //TEST TO FIND PRIMARY ID Info -- It works
-        if (count_inserts > 4) {
-            ArrayList<String> Primary_test = new ArrayList<>();
-            Primary_test.add("Tweety");
-            Primary_test.add("bird");
-            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
-            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
-        }
+//        if (count_inserts > 4) {
+//            ArrayList<String> Primary_test = new ArrayList<>();
+//            Primary_test.add("Tweety");
+//            Primary_test.add("bird");
+//            int index_prim = myDbms.table_list.get(table_index).getPrimaryIdIndex(Primary_test);
+//            myDbms.table_list.get(table_index).dataAtIndex(index_prim);
+//        }
     }
 
 
@@ -262,8 +284,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
             i++;
             //System.out.println("Name: " + name + " Type: " + type);
         }
-        //System.out.println("Get columns from table: " + myDbms.getTableName());
-       // myDbms.table_list.get(table_index).getColumnNames();
+        System.out.println("Get columns from table: " + myDbms.table_names.get(table_index));
+        myDbms.table_list.get(table_index).getColumnNames();
         System.out.println("-------------------end of table creation ------------------");
     }
 
@@ -345,7 +367,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         List<ParseTree> children = ctx.children;
         ParseTree new_tree = children.get(2);
         int children_num = children.get(2).getChildCount();
-        System.out.println(children.get(4).getText());
+        //System.out.println(children.get(4).getText());
 
         Table temp = myDbms.createTempTable();
 
@@ -354,7 +376,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         //AKA  IT IS AN EXISTING TABLE NOT A JUNK VARIABLE
         if(myDbms.indexOfTable(children.get(4).getText()) != -1){
             int table_index = myDbms.indexOfTable(children.get(4).getText());
-            myDbms.table_list.get(table_index).printTable();
+            //myDbms.table_list.get(table_index).printTable();
             for (int i =0; i < children_num; i++) {
                 if (count == 0) {
                     String column = new_tree.getChild(i).getText();
@@ -381,9 +403,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count = 0;
                 }
             }
-            //System.out.println("The project was of a table that exists");
-            //temp.printTable();
-            //System.out.println("The project was of a table that exists");
+            System.out.println("The project was of a table that exists");
+            temp.printTable();
             myDbms.temp_table_stack.push(temp);
         }
         //temp.printTable();
@@ -417,8 +438,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count2 = 0;
                 }
             }
-            //System.out.println("The project was of a temp table");
-            //temp2.printTable();
+            System.out.println("The project was of a temp table");
+            temp2.printTable();
             myDbms.temp_table_stack.push(temp2);
         }
     }
