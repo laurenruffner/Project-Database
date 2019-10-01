@@ -87,7 +87,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     //Recursion that retrieves the leaf nodes
     private void getLeafNodes(ParseTree node){
         if(node.getChildCount() == 0){
-            System.out.println(node.getText());
+            //System.out.println(node.getText());
             if (node.getText().compareTo("\"") != 0){
                 ConditionList.add(node.getText());
             }
@@ -112,47 +112,29 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
 
 
-//    @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx){
-//        //System.out.println(ctx);
-//        //System.out.println ("SHOW");
-//        List<ParseTree> children = ctx.children;
-//        //System.out.println(children.size());
-//
-//        //ParseTree _test = children.get(0);  //Ignore
-//
-//        String relationName;
-//        int i = 0;
-//        while (i < children.size()){
-//            if (i == 0){
-//                ParseTree _test = children.get(0);
-//                //System.out.println(_test);
-//            }
-//            else {
-//                if (children.get(i).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(i).getText();
-//                //System.out.println(relationName);
-//            }
-//            i++;
-//        }
-//
-//        //String relationName = children.get(1).getText();
-//
-//        //System.out.println(relationName);
-//
-//        //dbms.getTable(relationName);
-//
-//    }
+   @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx){
+        System.out.println("***********************************SHOW CMD********************************************");
+        List<ParseTree> children = ctx.children;
+        String table_name = children.get(1).getText();
+
+        if(myDbms.indexOfTable(table_name) != -1){
+           int index = myDbms.indexOfTable(table_name);
+           myDbms.table_list.get(index).printTable();
+        }
+        else{
+           Table table = myDbms.temp_table_stack.pop();
+           table.printTable();
+        }
+    }
 
     @Override public void exitInsert_cmd(RulesParser.Insert_cmdContext ctx) {
         //CURRENTLY DOES NOTHING WITH THE SECOND CASE OF INSERT JUST DEALS WITH CREATING THE TABLES
 
-        System.out.println("**********************************INSERT CMD**************************************");
+        //System.out.println("**********************************INSERT CMD**************************************");
         count_inserts++;
         List<ParseTree> children = ctx.children;
         int children_size = children.size();
-        System.out.println("Table Name: " + children.get(1).getText());
+        //System.out.println("Table Name: " + children.get(1).getText());
         int table_index = myDbms.indexOfTable(children.get(1).getText());
         int count = 0;
 
@@ -162,14 +144,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
             boolean isInteger;
             String data;
             while (i <  (children_size-1)){
-
                 if (children.get(i).getText().compareTo(",") == 0){
                     count++;
                 }
                 else if(children.get(i).getChild(0).getChildCount() >  1) {
                     data = children.get(i).getChild(0).getChild(1).getText();
                     myDbms.table_list.get(table_index).insertData(count, data, false);
-
                 }
                 else{
                     data = children.get(i).getChild(0).getText();
@@ -182,7 +162,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         else{
             // table_index -> index of the table inserting into
             // table is the table that we are taking the data from
-            System.out.println(myDbms.table_names.get(table_index));
+            //System.out.println(myDbms.table_names.get(table_index));
             Table table = myDbms.temp_table_stack.pop();
             int table_columns = table.table.size();
             int table_rows = table.table.get(0).size();
@@ -198,11 +178,11 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 }
             }
 
-            myDbms.table_list.get(table_index).printTable();
+            //myDbms.table_list.get(table_index).printTable();
         }
 
         //Prints table not visually aesthetic
-        myDbms.table_list.get(table_index).printTable();
+        //myDbms.table_list.get(table_index).printTable();
 
 
         //TEST TO FIND PRIMARY ID Info -- It works
@@ -284,21 +264,21 @@ public class MyRulesBaseListener extends RulesBaseListener {
             i++;
             //System.out.println("Name: " + name + " Type: " + type);
         }
-        System.out.println("Get columns from table: " + myDbms.table_names.get(table_index));
-        myDbms.table_list.get(table_index).getColumnNames();
-        System.out.println("-------------------end of table creation ------------------");
+        //System.out.println("Get columns from table: " + myDbms.table_names.get(table_index));
+        //myDbms.table_list.get(table_index).getColumnNames();
+        //System.out.println("-------------------end of table creation ------------------");
     }
 
 
     @Override public void exitSelection(RulesParser.SelectionContext ctx) {
-        //System.out.println("Exit Selection-----------------------");
+        //System.out.println("*************************SELECT********************************");
         List<ParseTree> children = ctx.children;
 
-        System.out.println(ConditionList);
+        //System.out.println(ConditionList);
         postfix();
-        System.out.println(PostFix);
+        //System.out.println(PostFix);
         String table_name = children.get(4).getText();
-        System.out.println(table_name);
+        //System.out.println(table_name);
         for (int i = 0; i < PostFix.size(); i++){
             String element = PostFix.get(i);
             //System.out.println("Element: " + element );
@@ -403,8 +383,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count = 0;
                 }
             }
-            System.out.println("The project was of a table that exists");
-            temp.printTable();
+            //System.out.println("The project was of a table that exists");
+            //temp.printTable();
             myDbms.temp_table_stack.push(temp);
         }
         //temp.printTable();
@@ -416,7 +396,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
             for (int i = 0; i < children_num; i++){
                 if (count2 == 0){
                     String column = new_tree.getChild(i).getText();
-                    System.out.println(column);
+                    //System.out.println(column);
                     int column_num = table.getColumnNumber(column);
                     if (table.table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")){
                         temp2.enterColumns(column_number2,column, "INTEGER");
@@ -438,8 +418,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count2 = 0;
                 }
             }
-            System.out.println("The project was of a temp table");
-            temp2.printTable();
+            //System.out.println("The project was of a temp table");
+            //temp2.printTable();
             myDbms.temp_table_stack.push(temp2);
         }
     }

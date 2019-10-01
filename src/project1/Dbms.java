@@ -105,12 +105,12 @@ public class Dbms {
     }
 
     public void oror(){
-        System.out.println("OROR ----------------------------------------");
+        //System.out.println("OROR ----------------------------------------");
         Table temp1 = temp_table_stack.pop();
         Table temp2 = temp_table_stack.pop();
 
-        temp1.printTable();
-        temp2.printTable();
+        //temp1.printTable();
+        //temp2.printTable();
 
         create_empty_temp_clone(temp1);
         Table temp = temp_table_stack.pop();
@@ -223,7 +223,7 @@ public class Dbms {
             }
             //table_list.get(index_table).dataAtIndex(index_list.get(i));
         }
-        temp.printTable();
+        //temp.printTable();
         temp_table_stack.push(temp);
         //temp_table_stack.get(0).printTable();
     }
