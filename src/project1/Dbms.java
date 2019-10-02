@@ -359,9 +359,13 @@ public class Dbms {
 
     public void compares(String operand1, String operand2, String operator, String table_name){
         int index_table = indexOfTable(table_name);
-        if (index_table != -1) {
+        //System.out.println("Index of table: " +  index_table);
+        if (!(index_table == -1)) {
+            //System.out.println("NOT A TEMP TABLE");
             int index_column = table_list.get(index_table).getColumnNumber(operand1);
+            //System.out.println("index_column: " + index_column);
             List<Integer> index_list = new ArrayList<>();
+
             index_list = table_list.get(index_table).findIndiciesCompare(index_column, operand2, operator);
             create_empty_temp_clone(table_list.get(index_table));
             Table temp = temp_table_stack.pop();
@@ -369,6 +373,7 @@ public class Dbms {
                 for (int j = 0; j < table_list.get(index_table).table.size(); j++) {  //gives you the column size
                     if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) { //integer
                         int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                       // System.out.println("Column Num: " + j);
                         temp.insertData(j, Integer.toString(data), true);
                     } else { //string
                         String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));

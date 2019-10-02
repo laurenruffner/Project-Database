@@ -293,7 +293,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitUnion(RulesParser.UnionContext ctx) {
-        System.out.println("Exit Union++++++++++++++++");
+        //System.out.println("Exit Union++++++++++++++++");
         List<ParseTree> children = ctx.children;
         Table table1 = null;
         Table table2 = null;
@@ -388,7 +388,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitSelection(RulesParser.SelectionContext ctx) {
-        //System.out.println("*************************SELECT********************************");
+        System.out.println("*************************SELECT********************************");
         List<ParseTree> children = ctx.children;
 
         //System.out.println(ConditionList);
