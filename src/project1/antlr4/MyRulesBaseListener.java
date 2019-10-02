@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.*;
 import java.util.List;
+import java.io.*;
 
 public class MyRulesBaseListener extends RulesBaseListener {
     Dbms myDbms;
@@ -191,6 +192,85 @@ public class MyRulesBaseListener extends RulesBaseListener {
         catch(Exception e){
             System.out.println("You suck at typing");
         }
+    }
+
+    @Override public void exitWrite_cmd(RulesParser.Write_cmdContext ctx) {
+        List<ParseTree> children = ctx.children;
+        String tableName = children.get(1).getText(); //tableName will also be the file name
+        int index = myDbms.indexOfTable(tableName);
+        try {
+            Table t = myDbms.table_list.get(index);
+            FileWriter fw = new FileWriter("src/Files/" + tableName + ".db");
+            int total_rows = t.table.get(0).size();
+            int total_columns = t.column_name.size();
+            fw.write("----------- " + t.table_name + " -----------\n");
+            for (int j=0; j< t.column_name.size(); j++){
+                if (j == t.column_name.size()-1){
+                    fw.write(t.column_name.get(j));
+                }
+                else {
+                    fw.write(t.column_name.get(j) + " | ");
+                }
+            }
+            fw.write("\n");
+            for (int k=0; k < total_rows; k++){
+                for (int i = 0; i < total_columns; i++) {
+                    if(i  == total_columns -1){
+                        fw.write(t.table.get(i).get(k)+"");
+                    }
+                    else {
+                        fw.write(t.table.get(i).get(k) + " | ");
+                    }
+                }
+                fw.write("\n");
+            }
+            fw.close();
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override public void exitClose_cmd(RulesParser.Close_cmdContext ctx) {
+        List<ParseTree> children = ctx.children;
+        String tableName = children.get(1).getText(); //tableName will also be the file name
+        int index = myDbms.indexOfTable(tableName);
+        try {
+            Table t = myDbms.table_list.get(index);
+            FileWriter fw = new FileWriter("src/Files/" + tableName + ".db");
+            int total_rows = t.table.get(0).size();
+            int total_columns = t.column_name.size();
+            fw.write("----------- " + t.table_name + " -----------\n");
+            for (int j=0; j< t.column_name.size(); j++){
+                if (j == t.column_name.size()-1){
+                    fw.write(t.column_name.get(j));
+                }
+                else {
+                    fw.write(t.column_name.get(j) + " | ");
+                }
+            }
+            fw.write("\n");
+            for (int k=0; k < total_rows; k++){
+                for (int i = 0; i < total_columns; i++) {
+                    if(i  == total_columns -1){
+                        fw.write(t.table.get(i).get(k)+"");
+                    }
+                    else {
+                        fw.write(t.table.get(i).get(k) + " | ");
+                    }
+                }
+                fw.write("\n");
+            }
+            fw.close();
+            myDbms.table_list.remove(index);//remove table from myDbms object
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override public void exitExit_cmd(RulesParser.Exit_cmdContext ctx) {
+        System.exit(0);
     }
 
     @Override
