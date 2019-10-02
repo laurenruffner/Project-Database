@@ -4,6 +4,8 @@ import project1.Dbms;
 import project1.Table;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.*;
 import java.util.List;
 
@@ -116,6 +118,32 @@ public class MyRulesBaseListener extends RulesBaseListener {
         PostFix = new ArrayList<>();
     }
 
+    @Override public void exitOpen_cmd(RulesParser.Open_cmdContext ctx) {
+//        List<ParseTree> children = ctx.children;
+//        String table_name = children.get(1).getText();
+//        try{
+//            String filename = "src/Files/" +  table_name  + ".db";
+//            BufferedReader in = new BufferedReader(new FileReader(filename));
+//            String str;
+//            int line_num = 0;
+//            int table_index = -1;
+//            while ((str = in.readLine()) != null)
+//                if(line_num == 0){
+//                    myDbms.createTable(table_name);
+//                }
+//                else if(line_num == 1){
+//                    table_index = myDbms.indexOfTable(table_name);
+//
+//                }
+//                System.out.println(str);
+//            in.close();
+//
+//
+//        }
+//        catch(Exception e){
+//            System.out.println("You suck at typing");
+//        }
+    }
 
     @Override
     public void exitShow_cmd(RulesParser.Show_cmdContext ctx) {
@@ -722,9 +750,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
  System.out.println("Enter Open Cmd");
  }
 
- @Override public void exitOpen_cmd(RulesParser.Open_cmdContext ctx) {
- System.out.println("Exit Open Cmd");
- }
 
  @Override public void enterClose_cmd(RulesParser.Close_cmdContext ctx) {
  System.out.println("Enter Close Cmd");

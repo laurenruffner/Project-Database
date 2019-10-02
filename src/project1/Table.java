@@ -135,9 +135,7 @@ public class Table {
                     row++;
                 }
             }
-
         }
-
         //System.out.println("Exit");
         return row;
     }
@@ -335,14 +333,25 @@ public class Table {
     public void printTable(){
         int total_rows = table.get(0).size();
         int total_columns = column_name.size();
-        System.out.println("--------------------" + table_name + "---------------");
+        System.out.println("----------- " + table_name + " -----------");
         for (int j=0; j< column_name.size(); j++){
-            System.out.print("|" + column_name.get(j) + "|");
+            if (j == column_name.size()-1){
+                System.out.print( column_name.get(j));
+            }
+            else {
+                System.out.print(column_name.get(j) + " | ");
+            }
         }
         System.out.println();
+        //System.out.println("-----------------------------");
         for (int k=0; k < total_rows; k++){
             for (int i = 0; i < total_columns; i++) {
-                System.out.print("|" + table.get(i).get(k) + "|" );
+                if(i  == total_columns -1){
+                    System.out.print(table.get(i).get(k));
+                }
+                else {
+                    System.out.print(table.get(i).get(k) + " | ");
+                }
             }
             System.out.println();
         }
