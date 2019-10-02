@@ -151,41 +151,59 @@ public class Dbms {
 
 
     public void equality(String operand1, String operand2, String table_name){
-//        System.out.println("$ " + operand1);
-//        System.out.println("$ "+ operand2);
-          //System.out.println("$ " + table_name);
 
         int index_table = indexOfTable(table_name);
-        //System.out.println(table_names.get(index_table));
-        int index_column = table_list.get(index_table).getColumnNumber(operand1);
-        //System.out.println(table_list.get(index_table).column_name.get(index_column));
+        if(index_table != -1) {
+            int index_column = table_list.get(index_table).getColumnNumber(operand1);
 
-        List<Integer> index_list = new ArrayList<>();
-        index_list = table_list.get(index_table).findIndicies(index_column, operand2);
-        //System.out.println(index_list);
+            List<Integer> index_list = new ArrayList<>();
+            index_list = table_list.get(index_table).findIndicies(index_column, operand2);
 
-        create_empty_temp_clone(table_list.get(index_table));
-        Table temp = temp_table_stack.pop();
+            create_empty_temp_clone(table_list.get(index_table));
+            Table temp = temp_table_stack.pop();
 
-        for (int i =0; i < index_list.size(); i++){
-            for (int j = 0; j <  table_list.get(index_table).table.size(); j++){  //gives you the column size
-                if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")){
-                    //System.out.println("Integer");
-                    int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
-                    //System.out.println("Data is integer: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
-                    temp.insertData(j,Integer.toString(data),true);
+            for (int i = 0; i < index_list.size(); i++) {
+                for (int j = 0; j < table_list.get(index_table).table.size(); j++) {  //gives you the column size
+                    if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) {
+                        //System.out.println("Integer");
+                        int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                        //System.out.println("Data is integer: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
+                        temp.insertData(j, Integer.toString(data), true);
+                    } else {
+                        //System.out.println("String");
+                        String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                        //System.out.println("Data is String: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
+                        temp.insertData(j, data, false);
+                    }//data = table_list.get(index_table).table.get(j).get(index_list.get(i));
                 }
-                else{
-                    //System.out.println("String");
-                    String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
-                    //System.out.println("Data is String: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
-                    temp.insertData(j,data,false);
-                }//data = table_list.get(index_table).table.get(j).get(index_list.get(i));
+                //table_list.get(index_table).dataAtIndex(index_list.get(i));
             }
-            //table_list.get(index_table).dataAtIndex(index_list.get(i));
+            //temp.printTable();
+            temp_table_stack.push(temp);
         }
-        //temp.printTable();
-        temp_table_stack.push(temp);
+        else{
+            Table temp_table = temp_table_stack.pop();
+            int index_column = temp_table.getColumnNumber(operand1);
+
+            List<Integer> index_list = new ArrayList<>();
+            index_list = temp_table.findIndicies(index_column, operand2);
+
+            create_empty_temp_clone(temp_table);
+            Table temp = temp_table_stack.pop();
+
+            for (int i = 0; i < index_list.size(); i++) {
+                for (int j = 0; j < temp_table.table.size(); j++) {  //gives you the column size
+                    if (temp_table.table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) {
+                        int data = (Integer) temp_table.table.get(j).get(index_list.get(i));
+                        temp.insertData(j, Integer.toString(data), true);
+                    } else {
+                        String data = (String) temp_table.table.get(j).get(index_list.get(i));
+                        temp.insertData(j, data, false);
+                    }
+                }
+            }
+            temp_table_stack.push(temp);
+        }
         //temp_table_stack.get(0).printTable();
     }
     public void not_equality(String operand1, String operand2, String table_name){
@@ -194,62 +212,108 @@ public class Dbms {
         //System.out.println("$ " + table_name);
 
         int index_table = indexOfTable(table_name);
-        //System.out.println(table_names.get(index_table));
-        int index_column = table_list.get(index_table).getColumnNumber(operand1);
-        //System.out.println(table_list.get(index_table).column_name.get(index_column));
+        if (index_table != -1) {
+            //System.out.println(table_names.get(index_table));
+            int index_column = table_list.get(index_table).getColumnNumber(operand1);
+            //System.out.println(table_list.get(index_table).column_name.get(index_column));
 
-        List<Integer> index_list = new ArrayList<>();
-        // FIND everything but operand2
-        index_list = table_list.get(index_table).findAllButIndicies(index_column, operand2);
-        //System.out.println(index_list);
+            List<Integer> index_list = new ArrayList<>();
+            // FIND everything but operand2
+            index_list = table_list.get(index_table).findAllButIndicies(index_column, operand2);
+            //System.out.println(index_list);
 
-        create_empty_temp_clone(table_list.get(index_table));
-        Table temp = temp_table_stack.pop();
+            create_empty_temp_clone(table_list.get(index_table));
+            Table temp = temp_table_stack.pop();
 
-        for (int i =0; i < index_list.size(); i++){
-            for (int j = 0; j <  table_list.get(index_table).table.size(); j++){  //gives you the column size
-                if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")){
-                    //System.out.println("Integer");
-                    int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
-                    //System.out.println("Data is integer: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
-                    temp.insertData(j,Integer.toString(data),true);
+            for (int i = 0; i < index_list.size(); i++) {
+                for (int j = 0; j < table_list.get(index_table).table.size(); j++) {  //gives you the column size
+                    if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) {
+                        //System.out.println("Integer");
+                        int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                        //System.out.println("Data is integer: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
+                        temp.insertData(j, Integer.toString(data), true);
+                    } else {
+                        //System.out.println("String");
+                        String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                        //System.out.println("Data is String: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
+                        temp.insertData(j, data, false);
+                    }//data = table_list.get(index_table).table.get(j).get(index_list.get(i));
                 }
-                else{
-                    //System.out.println("String");
-                    String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
-                    //System.out.println("Data is String: " + data + "Column: [" + j + "] " + temp.column_name.get(j) );
-                    temp.insertData(j,data,false);
-                }//data = table_list.get(index_table).table.get(j).get(index_list.get(i));
+                //table_list.get(index_table).dataAtIndex(index_list.get(i));
             }
-            //table_list.get(index_table).dataAtIndex(index_list.get(i));
+            //temp.printTable();
+            temp_table_stack.push(temp);
+            //temp_table_stack.get(0).printTable();
         }
-        //temp.printTable();
-        temp_table_stack.push(temp);
-        //temp_table_stack.get(0).printTable();
+        else{
+            Table temp_table = temp_table_stack.pop();
+            int index_column = temp_table.getColumnNumber(operand1);
+
+            List<Integer> index_list = new ArrayList<>();
+            index_list = temp_table.findAllButIndicies(index_column, operand2);
+
+            create_empty_temp_clone(temp_table);
+            Table temp = temp_table_stack.pop();
+
+            for (int i = 0; i < index_list.size(); i++) {
+                for (int j = 0; j < temp_table.table.size(); j++) {  //gives you the column size
+                    if (temp_table.table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) {
+                        int data = (Integer) temp_table.table.get(j).get(index_list.get(i));
+                        temp.insertData(j, Integer.toString(data), true);
+                    } else {
+                        String data = (String) temp_table.table.get(j).get(index_list.get(i));
+                        temp.insertData(j, data, false);
+                    }
+                }
+            }
+            temp_table_stack.push(temp);
+        }
     }
 
     public void compares(String operand1, String operand2, String operator, String table_name){
         int index_table = indexOfTable(table_name);
-        int index_column = table_list.get(index_table).getColumnNumber(operand1);
-        List<Integer> index_list = new ArrayList<>();
-        index_list = table_list.get(index_table).findIndiciesCompare(index_column, operand2, operator);
-        create_empty_temp_clone(table_list.get(index_table));
-        Table temp = temp_table_stack.pop();
-        for (int i =0; i < index_list.size(); i++){
-            for (int j = 0; j <  table_list.get(index_table).table.size(); j++){  //gives you the column size
-                if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")){ //integer
-                    int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
-                    temp.insertData(j,Integer.toString(data),true);
-                }
-                else{ //string
-                    String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
-                    temp.insertData(j,data,false);
+        if (index_table != -1) {
+            int index_column = table_list.get(index_table).getColumnNumber(operand1);
+            List<Integer> index_list = new ArrayList<>();
+            index_list = table_list.get(index_table).findIndiciesCompare(index_column, operand2, operator);
+            create_empty_temp_clone(table_list.get(index_table));
+            Table temp = temp_table_stack.pop();
+            for (int i = 0; i < index_list.size(); i++) {
+                for (int j = 0; j < table_list.get(index_table).table.size(); j++) {  //gives you the column size
+                    if (table_list.get(index_table).table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) { //integer
+                        int data = (Integer) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                        temp.insertData(j, Integer.toString(data), true);
+                    } else { //string
+                        String data = (String) table_list.get(index_table).table.get(j).get(index_list.get(i));
+                        temp.insertData(j, data, false);
+                    }
                 }
             }
+            //temp.printTable();
+            temp_table_stack.push(temp);
+            //temp_table_stack.get(0).printTable();
         }
-        //temp.printTable();
-        temp_table_stack.push(temp);
-        //temp_table_stack.get(0).printTable();
+        else{
+            Table temp_table = temp_table_stack.pop();
+            int index_column = temp_table.getColumnNumber(operand1);
+            List<Integer> index_list = new ArrayList<>();
+            index_list = temp_table.findIndiciesCompare(index_column, operand2, operator);
+            create_empty_temp_clone(temp_table);
+            Table temp = temp_table_stack.pop();
+            for (int i = 0; i < index_list.size(); i++) {
+                for (int j = 0; j < temp_table.table.size(); j++) {  //gives you the column size
+                    if (temp_table.table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) { //integer
+                        int data = (Integer) temp_table.table.get(j).get(index_list.get(i));
+                        temp.insertData(j, Integer.toString(data), true);
+                    } else { //string
+                        String data = (String) temp_table.table.get(j).get(index_list.get(i));
+                        temp.insertData(j, data, false);
+                    }
+                }
+            }
+            //temp.printTable();
+            temp_table_stack.push(temp);
+        }
     }
 
     public Table clone_table(Table table){

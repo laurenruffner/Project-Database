@@ -142,6 +142,26 @@ public class Table {
         return row;
     }
 
+    public int getRowIndex(List<Object> row_to_look_for){
+        int row = -1;
+        int columns = table.size();
+        int rows = table.get(0).size();
+        for (int j=0; j < rows; j++) {
+            for (int i = 0; i < columns; i++){
+                if((row_to_look_for.get(i).equals(table.get(i).get(j))) && (i == columns-1)){
+                    return j;
+                }
+                else if (row_to_look_for.get(i).equals(table.get(i).get(j))){
+                    continue;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        return -1;
+    }
+
     //THIS RETURNS THE DATA IN A VISUAL WAY AT A SPECIFIC INDEX --- Tweety, bird , 1
     public void dataAtIndex (int index){
         for (int j = 0; j < column_name.size(); j++){
