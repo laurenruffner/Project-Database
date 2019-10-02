@@ -3,7 +3,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import project1.Dbms;
 import project1.Table;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class MyRulesBaseListener extends RulesBaseListener {
     Dbms myDbms;
@@ -23,7 +25,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
-    ;
     private static Map<String, Operator> ops = new HashMap<String, Operator>() {{
         put("&&", Operator.AND);
         put("||", Operator.OR);
@@ -316,9 +317,53 @@ public class MyRulesBaseListener extends RulesBaseListener {
         PostFix.clear();
     }
 
+    @Override public void exitQuery(RulesParser.QueryContext ctx) {
+        List<ParseTree> children = ctx.children;
+        String relationName;
+//        int i = 0;
+//        while (i < children.size()){
+//            if (i == 0){
+//                ParseTree _test = children.get(0);
+//                System.out.println(_test.getText());
+//            }
+//            else {
+//                if (children.get(i).getChildCount() != 0){
+//
+//                }
+//                relationName = children.get(i).getText();
+//                System.out.println(relationName);
+//            }
+//            i++;
+//        }
+        String new_table_name = children.get(0).getText();
+        if (myDbms.indexOfTable(children.get(2).getText()) != -1){
+            int index_of_table_cloning = myDbms.indexOfTable(children.get(2).getText());
+            Table new_table = myDbms.clone_table(myDbms.table_list.get(index_of_table_cloning));
+            new_table.table_name = new_table_name;
+            //new_table.printTable();
+            myDbms.table_list.add(new_table);
+            myDbms.table_names.add(new_table_name);
+            //int index_of_new_table = myDbms.indexOfTable(new_table_name);
+            //System.out.println(index_of_new_table);
+            //myDbms.table_list.get(index_of_new_table).printTable();
+        }
+        else{
+            Table old_table = myDbms.temp_table_stack.pop();
+            old_table.table_name = new_table_name;
+            //old_table.printTable();
+            myDbms.table_list.add(old_table);
+            myDbms.table_names.add(new_table_name);
+            int index_of_new_table = myDbms.indexOfTable(new_table_name);
+            //System.out.println(index_of_new_table);
+            //myDbms.table_list.get(index_of_new_table).printTable();
+
+        }
+
+    }
+
     @Override
     public void exitUpdate_cmd(RulesParser.Update_cmdContext ctx) {
-        System.out.println("************Exit Update Cmd******************");
+        //System.out.println("************Exit Update Cmd******************");
 
         List<ParseTree> children = ctx.children;
         //System.out.println(ConditionList);
@@ -577,7 +622,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitRenaming(RulesParser.RenamingContext ctx) {
-        System.out.println("Exit Renaming**************************");
+        //System.out.println("Exit Renaming**************************");
         List<ParseTree> children = ctx.children;
 
         String table_name = children.get(4).getText();
@@ -594,17 +639,17 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 myDbms.table_list.get(table_index).column_name.set(i, new_tree.getChild(count).getText());
                 count += 2;
             }
-            myDbms.table_list.get(table_index).printTable();
+            //myDbms.table_list.get(table_index).printTable();
         } else {
             Table table = myDbms.temp_table_stack.pop();
-            table.printTable();
+            //table.printTable();
             int columns = table.table.size();
             int count1 = 0;
             for (int i = 0; i < columns; i++) {
                 table.column_name.set(i, new_tree.getChild(count1).getText());
                 count1 += 2;
             }
-            table.printTable();
+            //table.printTable();
             myDbms.temp_table_stack.push(table);
         }
     }
@@ -799,10 +844,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
  @Override public void enterQuery(RulesParser.QueryContext ctx) {
  System.out.println("Enter Query");
- }
-
- @Override public void exitQuery(RulesParser.QueryContext ctx) {
- System.out.println("Exit Query");
  }
 
  @Override public void enterProgram(RulesParser.ProgramContext ctx) {
