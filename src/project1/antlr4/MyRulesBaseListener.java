@@ -184,10 +184,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
             //myDbms.table_list.get(table_index).printTable();
         }
 
-        //Prints table not visually aesthetic
-        //myDbms.table_list.get(table_index).printTable();
-
-
         //TEST TO FIND PRIMARY ID Info -- It works
 //        if (count_inserts > 4) {
 //            ArrayList<String> Primary_test = new ArrayList<>();
@@ -198,6 +194,49 @@ public class MyRulesBaseListener extends RulesBaseListener {
 //        }
     }
 
+    @Override public void exitDifference(RulesParser.DifferenceContext ctx) {
+        System.out.println("Exit Difference________________");
+        List<ParseTree> children = ctx.children;
+        Table table1 = null;
+        Table table2 = null;
+        String table1_name = children.get(0).getText();
+        String table2_name = children.get(2).getText();
+        if (myDbms.indexOfTable(table2_name) == -1){
+            table2 = myDbms.temp_table_stack.pop();
+        }
+        else{
+            table2 = myDbms.table_list.get(myDbms.indexOfTable(table2_name));
+        }
+        if(myDbms.indexOfTable(table1_name) == -1){
+            table1 = myDbms.temp_table_stack.pop();
+        }
+        else{
+            table1 = myDbms.table_list.get(myDbms.indexOfTable(table1_name));
+        }
+        myDbms.difference(table1,table2);
+    }
+
+    @Override public void exitUnion(RulesParser.UnionContext ctx) {
+        System.out.println("Exit Union++++++++++++++++");
+        List<ParseTree> children = ctx.children;
+        Table table1 = null;
+        Table table2 = null;
+        String table1_name = children.get(0).getText();
+        String table2_name = children.get(2).getText();
+        if (myDbms.indexOfTable(table2_name) == -1){
+            table2 = myDbms.temp_table_stack.pop();
+        }
+        else{
+            table2 = myDbms.table_list.get(myDbms.indexOfTable(table2_name));
+        }
+        if(myDbms.indexOfTable(table1_name) == -1){
+            table1 = myDbms.temp_table_stack.pop();
+        }
+        else{
+            table1 = myDbms.table_list.get(myDbms.indexOfTable(table1_name));
+        }
+        myDbms.union(table1,table2);
+    }
 
     @Override
     public void exitCreate_cmd(RulesParser.Create_cmdContext ctx) {
@@ -237,7 +276,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         int i = 0;
         int count = 0;
         String name = null;
-
 
         while (i < children_num) {
             if (count == 0) {
@@ -320,21 +358,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     @Override public void exitQuery(RulesParser.QueryContext ctx) {
         List<ParseTree> children = ctx.children;
         String relationName;
-//        int i = 0;
-//        while (i < children.size()){
-//            if (i == 0){
-//                ParseTree _test = children.get(0);
-//                System.out.println(_test.getText());
-//            }
-//            else {
-//                if (children.get(i).getChildCount() != 0){
-//
-//                }
-//                relationName = children.get(i).getText();
-//                System.out.println(relationName);
-//            }
-//            i++;
-//        }
         String new_table_name = children.get(0).getText();
         if (myDbms.indexOfTable(children.get(2).getText()) != -1){
             int index_of_table_cloning = myDbms.indexOfTable(children.get(2).getText());
@@ -793,17 +816,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
  System.out.println("Enter Union");
  }
 
- @Override public void exitUnion(RulesParser.UnionContext ctx) {
- System.out.println("Exit Union");
- }
+
 
  @Override public void enterDifference(RulesParser.DifferenceContext ctx) {
  System.out.println("Enter Difference");
  }
 
- @Override public void exitDifference(RulesParser.DifferenceContext ctx) {
- System.out.println("Exit Difference");
- }
 
  @Override public void enterProduct(RulesParser.ProductContext ctx) {
  System.out.println("Enter Product");
