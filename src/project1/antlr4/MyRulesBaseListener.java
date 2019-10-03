@@ -263,6 +263,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
             }
             fw.close();
             myDbms.table_list.remove(index);//remove table from myDbms object
+            myDbms.table_names.remove(index);
         }
         catch(Exception e){
             System.out.println(e);
@@ -497,35 +498,72 @@ public class MyRulesBaseListener extends RulesBaseListener {
         postfix();
         //System.out.println(PostFix);
         String table_name = children.get(4).getText();
-        //System.out.println(table_name);
-        for (int i = 0; i < PostFix.size(); i++) {
-            String element = PostFix.get(i);
-            //System.out.println("Element: " + element );
-            if (element.equals("&&") || element.equals("||")) {
-                //tables and more tables
-                if (element.equals("&&")) {
-                    myDbms.andand();
-                } else {
-                    myDbms.oror();
+        int table_index = myDbms.indexOfTable(table_name);
+        //System.out.println(table_name + " " + table_index);
+        if (table_index == -1){
+            Table workon = myDbms.temp_table_stack.pop();
+            for (int i = 0; i < PostFix.size(); i++) {
+                String element = PostFix.get(i);
+                //System.out.println("Element: " + element );
+                if (element.equals("&&") || element.equals("||")) {
+                    //tables and more tables
+                    if (element.equals("&&")) {
+                        myDbms.andand();
+                    } else {
+                        myDbms.oror();
+                    }
+                    continue;
+                } else if (ops.containsKey(PostFix.get(i))) {
+                    String operand1 = PostFix.get(i - 2);
+                    String operand2 = PostFix.get(i - 1);
+                    //System.out.println("Operand1: " + operand1);
+                    //System.out.println("Operand2: " + operand2);
+                    if (element.equals("==")) {
+                        myDbms.equality_from_temp(operand1, operand2, workon);
+                    } else if (element.equals("!=")) {
+                        myDbms.not_equality_from_temp(operand1, operand2, workon);
+                    } else if (element.equals(">=")) {
+                        myDbms.compares_from_temp(operand1, operand2, element, workon);
+                    } else if (element.equals("<=")) {
+                        myDbms.compares_from_temp(operand1, operand2, element, workon);
+                    } else if (element.equals(">")) {
+                        myDbms.compares_from_temp(operand1, operand2, element, workon);
+                    } else if (element.equals("<")) {
+                        myDbms.compares_from_temp(operand1, operand2, element, workon);
+                    }
                 }
-                continue;
-            } else if (ops.containsKey(PostFix.get(i))) {
-                String operand1 = PostFix.get(i - 2);
-                String operand2 = PostFix.get(i - 1);
-                //System.out.println("Operand1: " + operand1);
-                //System.out.println("Operand2: " + operand2);
-                if (element.equals("==")) {
-                    myDbms.equality(operand1, operand2, table_name);
-                } else if (element.equals("!=")) {
-                    myDbms.not_equality(operand1, operand2, table_name);
-                } else if (element.equals(">=")) {
-                    myDbms.compares(operand1, operand2, element, table_name);
-                } else if (element.equals("<=")) {
-                    myDbms.compares(operand1, operand2, element, table_name);
-                } else if (element.equals(">")) {
-                    myDbms.compares(operand1, operand2, element, table_name);
-                } else if (element.equals("<")) {
-                    myDbms.compares(operand1, operand2, element, table_name);
+            }
+        }
+        else {
+            for (int i = 0; i < PostFix.size(); i++) {
+                String element = PostFix.get(i);
+                //System.out.println("Element: " + element );
+                if (element.equals("&&") || element.equals("||")) {
+                    //tables and more tables
+                    if (element.equals("&&")) {
+                        myDbms.andand();
+                    } else {
+                        myDbms.oror();
+                    }
+                    continue;
+                } else if (ops.containsKey(PostFix.get(i))) {
+                    String operand1 = PostFix.get(i - 2);
+                    String operand2 = PostFix.get(i - 1);
+                    //System.out.println("Operand1: " + operand1);
+                    //System.out.println("Operand2: " + operand2);
+                    if (element.equals("==")) {
+                        myDbms.equality(operand1, operand2, table_name);
+                    } else if (element.equals("!=")) {
+                        myDbms.not_equality(operand1, operand2, table_name);
+                    } else if (element.equals(">=")) {
+                        myDbms.compares(operand1, operand2, element, table_name);
+                    } else if (element.equals("<=")) {
+                        myDbms.compares(operand1, operand2, element, table_name);
+                    } else if (element.equals(">")) {
+                        myDbms.compares(operand1, operand2, element, table_name);
+                    } else if (element.equals("<")) {
+                        myDbms.compares(operand1, operand2, element, table_name);
+                    }
                 }
             }
         }
@@ -756,6 +794,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         int column_number = 0;
         //AKA  IT IS AN EXISTING TABLE NOT A JUNK VARIABLE
         if (myDbms.indexOfTable(children.get(4).getText()) != -1) {
+            System.out.println("NOT A TEMP TABLE");
             int table_index = myDbms.indexOfTable(children.get(4).getText());
             //myDbms.table_list.get(table_index).printTable();
             for (int i = 0; i < children_num; i++) {
@@ -788,7 +827,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
         //temp.printTable();
         else {
+            //System.out.println("TEMP TABLE AS OUT");
             Table table = myDbms.temp_table_stack.pop();
+            //table.printTable();
             Table temp2 = myDbms.createTempTable();
             int count2 = 0;
             int column_number2 = 0;

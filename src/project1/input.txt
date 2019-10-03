@@ -10,14 +10,16 @@ SHOW animals;
 
 dogs <- select (kind == "dog") animals;
 old_dogs <- select (years > 10) dogs;
-
 cats_or_dogs <- dogs + (select (kind == "cat") animals);
+SHOW cats_or_dogs;
 
 CREATE TABLE species (kind VARCHAR(10)) PRIMARY KEY (kind);
 
 INSERT INTO species VALUES FROM RELATION project (kind) animals;
+SHOW species;
 
 a <- rename (aname, akind) (project (name, kind) animals);
+SHOW (select (aname == name && akind != kind) (a * animals));
 common_names <- project (name) (select (aname == name && akind != kind) (a * animals));
 answer <- common_names;
 
@@ -25,5 +27,4 @@ SHOW answer;
 
 WRITE animals;
 CLOSE animals;
-
 EXIT;

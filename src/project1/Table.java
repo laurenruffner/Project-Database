@@ -252,6 +252,18 @@ public class Table {
         }
         return index_list;
     }
+
+    public List<Integer> findIndicies_columns(int column_num, int column_num_2){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j =0; j < total_row; j++){
+            if (table.get(column_num_2).get(j).equals(table.get(column_num).get(j))){
+                index_list.add(j);
+            }
+        }
+        return index_list;
+    }
+
     public List<Integer> findAllButIndicies(int column_num, String find){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
@@ -269,6 +281,17 @@ public class Table {
                     index_list.add(j);
                     //System.out.println("Same");
                 }
+            }
+        }
+        return index_list;
+    }
+
+    public List<Integer> findAllButIndicies_column(int column_num, int column_num2){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j =0; j < total_row; j++){
+            if (!(table.get(column_num2).get(j).equals(table.get(column_num).get(j)))){
+                index_list.add(j);
             }
         }
         return index_list;
@@ -323,6 +346,34 @@ public class Table {
                     if (find.compareTo((String) table.get(column_num).get(j)) > 0){
                         index_list.add(j);
                     }
+                }
+            }
+        }
+        return index_list;
+    }
+
+    public List<Integer> findIndiciesCompare_column(int column_num, int column_num2, String op){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j = 0; j < total_row; j++){
+            if (op.equals(">=")){
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) <= 0) {
+                    index_list.add(j);
+                }
+            }
+            else if (op.equals("<=")) {
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) >= 0) {
+                    index_list.add(j);
+                }
+            }
+            else if (op.equals(">")) {
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) < 0) {
+                    index_list.add(j);
+                }
+            }
+            else if (op.equals("<")) {
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) > 0) {
+                    index_list.add(j);
                 }
             }
         }
