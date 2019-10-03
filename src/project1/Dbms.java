@@ -300,7 +300,7 @@ public class Dbms {
         if(table.getColumnNumber(operand2) != -1) {
             int index_column2 = table.getColumnNumber(operand2);
             index_list = table.findIndicies_columns(index_column, index_column2);
-            System.out.println(index_list);
+            //System.out.println(index_list);
 
             create_empty_temp_clone(table);
             Table temp = temp_table_stack.pop();
@@ -326,7 +326,7 @@ public class Dbms {
         }
         else{
             index_list = table.findIndicies(index_column, operand2);
-            System.out.println(index_list);
+            //System.out.println(index_list);
 
             create_empty_temp_clone(table);
             Table temp = temp_table_stack.pop();

@@ -19,7 +19,6 @@ INSERT INTO species VALUES FROM RELATION project (kind) animals;
 SHOW species;
 
 a <- rename (aname, akind) (project (name, kind) animals);
-SHOW (select (aname == name && akind != kind) (a * animals));
 common_names <- project (name) (select (aname == name && akind != kind) (a * animals));
 answer <- common_names;
 

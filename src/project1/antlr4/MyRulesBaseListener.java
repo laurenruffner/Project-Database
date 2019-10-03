@@ -276,7 +276,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitShow_cmd(RulesParser.Show_cmdContext ctx) {
-        System.out.println("***********************************SHOW CMD********************************************");
+        //System.out.println("***********************************SHOW CMD********************************************");
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
 
@@ -352,7 +352,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitProduct(RulesParser.ProductContext ctx) {
-        System.out.println("Exit Product*******************");
+        //System.out.println("Exit Product*******************");
         List<ParseTree> children = ctx.children;
         Table table1 = null;
         Table table2 = null;
@@ -374,7 +374,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitDifference(RulesParser.DifferenceContext ctx) {
-        System.out.println("Exit Difference________________");
+        //System.out.println("Exit Difference________________");
         List<ParseTree> children = ctx.children;
         Table table1 = null;
         Table table2 = null;
@@ -419,7 +419,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitCreate_cmd(RulesParser.Create_cmdContext ctx) {
-        System.out.println("**********************************CREATE CMD*******************************************");
+        //System.out.println("**********************************CREATE CMD*******************************************");
         int table_index = myDbms.emptyTableLocation();
 
         List<ParseTree> children = ctx.children;
@@ -491,7 +491,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitSelection(RulesParser.SelectionContext ctx) {
-        System.out.println("*************************SELECT********************************");
+        //System.out.println("*************************SELECT********************************");
         List<ParseTree> children = ctx.children;
 
         //System.out.println(ConditionList);
@@ -794,7 +794,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         int column_number = 0;
         //AKA  IT IS AN EXISTING TABLE NOT A JUNK VARIABLE
         if (myDbms.indexOfTable(children.get(4).getText()) != -1) {
-            System.out.println("NOT A TEMP TABLE");
+            //System.out.println("NOT A TEMP TABLE");
             int table_index = myDbms.indexOfTable(children.get(4).getText());
             //myDbms.table_list.get(table_index).printTable();
             for (int i = 0; i < children_num; i++) {
@@ -896,198 +896,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
-/**
- @Override public void enterRelation_name(RulesParser.Relation_nameContext ctx) {
- System.out.println("Enter Relation_Name");
- }
-
- @Override public void exitRelation_name(RulesParser.Relation_nameContext ctx) {
- System.out.println("Exit Relation_Name");
- }
-
- @Override public void enterAttribute_name(RulesParser.Attribute_nameContext ctx) {
- System.out.println("Enter Attribute_Name");
- }
-
- @Override public void exitAttribute_name(RulesParser.Attribute_nameContext ctx) {
- System.out.println("Exit Attribute_Name");
- }
-
- @Override public void enterOperand(RulesParser.OperandContext ctx) {
- System.out.println("Enter Operand");
- }
-
- @Override public void exitOperand(RulesParser.OperandContext ctx) {
- System.out.println("Exit Operand");
- }
-
- @Override public void enterType(RulesParser.TypeContext ctx) {
- System.out.println("Enter Type");
- }
-
- @Override public void exitType(RulesParser.TypeContext ctx) {
- System.out.println("Exit Type");
- }
-
- @Override public void enterAttribute_list(RulesParser.Attribute_listContext ctx) {
- System.out.println("Enter Attribute_List");
- }
-
- @Override public void exitAttribute_list(RulesParser.Attribute_listContext ctx) {
- System.out.println("Exit Attribute_List");
- }
-
- @Override public void enterOpen_cmd(RulesParser.Open_cmdContext ctx) {
- System.out.println("Enter Open Cmd");
- }
-
-
- @Override public void enterClose_cmd(RulesParser.Close_cmdContext ctx) {
- System.out.println("Enter Close Cmd");
- }
-
- @Override public void exitClose_cmd(RulesParser.Close_cmdContext ctx) {
- System.out.println("Exit Close Cmd");
- }
-
-
- @Override public void enterWrite_cmd(RulesParser.Write_cmdContext ctx) {
- System.out.println("Enter Write Cmd");
- }
-
- @Override public void exitWrite_cmd(RulesParser.Write_cmdContext ctx) {
- System.out.println("Exit Write Cmd");
- }
-
- @Override public void enterExit_cmd(RulesParser.Exit_cmdContext ctx) {
- System.out.println("Enter Exit Cmd");
- }
-
- @Override public void exitExit_cmd(RulesParser.Exit_cmdContext ctx) {
- System.out.println("Exit Exit Cmd");
- }
-
- @Override public void enterCondition(RulesParser.ConditionContext ctx) {
- System.out.println("Enter Condition");
- }
-
-
- @Override public void enterConjunction(RulesParser.ConjunctionContext ctx) {
- System.out.println("Enter Conjunction");
- }
-
- @Override public void exitConjunction(RulesParser.ConjunctionContext ctx) {
- System.out.println("Exit Conjunction");
- }
-
- @Override public void enterComparison(RulesParser.ComparisonContext ctx) {
- System.out.println("Enter Comparison");
- }
-
- @Override public void exitComparison(RulesParser.ComparisonContext ctx) {
- System.out.println("Exit Comparison");
- }
-
- @Override public void enterExpr(RulesParser.ExprContext ctx) {
- System.out.println("Enter Expr");
- }
-
- @Override public void exitExpr(RulesParser.ExprContext ctx) {
- System.out.println("Exit Expr");
- }
-
- @Override public void enterAtomic_expr(RulesParser.Atomic_exprContext ctx) {
- System.out.println("Enter Atomic_Expr");
- }
-
- @Override public void exitAtomic_expr(RulesParser.Atomic_exprContext ctx) {
- System.out.println("Exit Atomic_Expr");
- }
-
- @Override public void enterSelection(RulesParser.SelectionContext ctx) {
- System.out.println("Enter Selection");
- }
-
- @Override public void exitSelection(RulesParser.SelectionContext ctx) {
- System.out.println("Exit Selection");
- }
-
- @Override public void enterProjection(RulesParser.ProjectionContext ctx) {
- System.out.println("Enter Projection");
- }
-
- @Override public void exitProjection(RulesParser.ProjectionContext ctx) {
- System.out.println("Exit Projection");
- }
-
- @Override public void enterRenaming(RulesParser.RenamingContext ctx) {
- System.out.println("Enter Renaming");
- }
-
- @Override public void exitRenaming(RulesParser.RenamingContext ctx) {
- System.out.println("Exit Renaming");
- }
-
- @Override public void enterUnion(RulesParser.UnionContext ctx) {
- System.out.println("Enter Union");
- }
-
-
-
- @Override public void enterDifference(RulesParser.DifferenceContext ctx) {
- System.out.println("Enter Difference");
- }
-
-
- @Override public void enterProduct(RulesParser.ProductContext ctx) {
- System.out.println("Enter Product");
- }
-
- @Override public void exitProduct(RulesParser.ProductContext ctx) {
- System.out.println("Exit Product");
- }
-
- @Override public void enterShow_cmd(RulesParser.Show_cmdContext ctx) {
- System.out.println("Enter Show Cmd");
- }
-
- @Override public void exitShow_cmd(RulesParser.Show_cmdContext ctx) {
- System.out.println("Exit Show Cmd");
- }
-
-
- @Override public void enterUpdate_cmd(RulesParser.Update_cmdContext ctx) {
- System.out.println("Enter Update Cmd");
- }
-
- @Override public void enterInsert_cmd(RulesParser.Insert_cmdContext ctx) {
- System.out.println("Enter Insert Cmd");
- }
-
- @Override public void enterDelete_cmd(RulesParser.Delete_cmdContext ctx) {
- System.out.println("Enter Delete Cmd");
- }
-
- @Override public void enterCommand(RulesParser.CommandContext ctx) {
- System.out.println("Enter Command");
- }
-
- @Override public void exitCommand(RulesParser.CommandContext ctx) {
- System.out.println("Exit Command");
- }
-
- @Override public void enterQuery(RulesParser.QueryContext ctx) {
- System.out.println("Enter Query");
- }
-
- @Override public void enterProgram(RulesParser.ProgramContext ctx) {
- System.out.println("Enter Program");
- }
-
- @Override public void exitProgram(RulesParser.ProgramContext ctx) {
- System.out.println("Exit Program");
- }
- **/
 
 // USEFUL ONLY FOR SEEING WHAT THE CMD SEES
 
