@@ -408,6 +408,66 @@ public class Dbms {
         }
     }
 
+    public void product(Table table_name1, Table table_name2) {
+        Table temp1 = table_name1;
+        Table temp2 = table_name2;
+
+        create_empty_temp_clone(temp1);
+        Table temp = temp_table_stack.pop();
+        int amountToADD = temp2.column_name.size();
+        int addColumnIndex = temp.column_name.size() - 1;
+        for (int i = 0; i < amountToADD; i++) {
+            addColumnIndex++;
+            String type = temp2.table.get(i).get(0).getClass().getSimpleName();
+            if (type.equals("String")){
+                //System.out.println("Column is a string");
+                temp.enterColumns(addColumnIndex,temp2.column_name.get(i), "VARCHAR");
+            }
+            else{
+                //System.out.println("Column is integer");
+                temp.enterColumns(addColumnIndex,temp2.column_name.get(i), "INTEGER");
+            }
+        }
+        //temp.printTable();
+
+        //int columns = temp.table.size();
+        int columns1 = temp1.table.size();
+        int columns2 = temp2.table.size();
+        int rows1 = temp1.table.get(0).size();
+        int rows2 = temp2.table.get(0).size();
+        for(int m = 0; m < rows2; m++) {
+
+            for (int i = 0; i < rows1; i++) {
+                List<Object> row_of_temp1 = new ArrayList<>();
+                for (int j = 0; j < columns1; j++) {
+                    row_of_temp1.add(temp1.table.get(j).get(i));
+                    //System.out.println(temp1.table.get(j).get(i));
+                }
+
+                for (int l = 0; l < columns2; l++) {
+                    row_of_temp1.add(temp2.table.get(l).get(m));
+                    //System.out.println(temp2.table.get(l).get(m) );
+                }
+
+                for(int z = 0; z < row_of_temp1.size(); z++) {
+
+                    //System.out.println(row_of_temp1.get(z).getClass().getSimpleName());
+                    boolean integerData = row_of_temp1.get(z).getClass().getSimpleName().equals("Integer");
+                    //System.out.println(integerData);
+                    if (!integerData) {
+                        temp.insertData(z, (String) row_of_temp1.get(z), false);
+                    } else {
+                        temp.insertData(z, Integer.toString((Integer) row_of_temp1.get(z)), true);
+
+                    }
+                }
+            }
+        }
+
+        temp.printTable();
+        temp_table_stack.push(temp);
+    }
+
     public Table clone_table(Table table){
             //System.out.println("Column Names to duplicate: ");
             //table.getColumnNames();

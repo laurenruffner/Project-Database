@@ -350,6 +350,28 @@ public class MyRulesBaseListener extends RulesBaseListener {
 //        }
     }
 
+    @Override public void exitProduct(RulesParser.ProductContext ctx) {
+        System.out.println("Exit Product*******************");
+        List<ParseTree> children = ctx.children;
+        Table table1 = null;
+        Table table2 = null;
+        String table1_name = children.get(0).getText();
+        String table2_name = children.get(2).getText();
+        if (myDbms.indexOfTable(table2_name) == -1){
+            table2 = myDbms.temp_table_stack.pop();
+        }
+        else{
+            table2 = myDbms.table_list.get(myDbms.indexOfTable(table2_name));
+        }
+        if(myDbms.indexOfTable(table1_name) == -1){
+            table1 = myDbms.temp_table_stack.pop();
+        }
+        else{
+            table1 = myDbms.table_list.get(myDbms.indexOfTable(table1_name));
+        }
+        myDbms.product(table1,table2);
+    }
+
     @Override public void exitDifference(RulesParser.DifferenceContext ctx) {
         System.out.println("Exit Difference________________");
         List<ParseTree> children = ctx.children;
