@@ -1,13 +1,16 @@
 package project1;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+
+import javax.json.*;
+import java.util.*;
 
 public class Table {
+
     public String table_name;
     public ArrayList<ArrayList> table;
     public ArrayList<String> column_name;
-    public ArrayList<String> primary_id;
+    public ArrayList<String> primary_id; //This holds how the primary ID exists
 
     public Table(String name){
         table = new ArrayList<ArrayList>();
@@ -17,35 +20,28 @@ public class Table {
     }
 
     //THIS RETURNS THE INDEX THAT CAN THEN BE THROWN INTO dataAtIndex TO RETRIEVE THE DATA WITH A SPECIFIC PRIMARY ID
+    // WILL BE USED LATER. CURRENTLY UNUSED
     public int getPrimaryIdIndex(ArrayList<String> search){
         int column = 0;
         int row = 0;
         int total_row = table.get(0).size();
         int column_num = getColumnNumber(primary_id.get(0));
         for (int i = 0; i < total_row; i++) {
-            //System.out.println("Loop");
             try {
-                //System.out.println("Comparing: " + search.get(column));
-                //System.out.println("To: " + table.get(column_num).get(row));
                 Integer.parseInt(search.get(column));
                 if (Integer.valueOf(search.get(column)) == table.get(column_num).get(row)){
-                    //System.out.println("Same");
                     column++;
                     for(int j = 1; j < search.size(); j++){
                         int column_num_temp = getColumnNumber(primary_id.get(j));
                         try {
-                            //System.out.println("Comparing: " + search.get(column));
-                            //System.out.println("To: " + table.get(column_num_temp).get(row));
                             Integer.parseInt(search.get(column));
                             if (Integer.valueOf(search.get(column)) == table.get(column_num_temp).get(row)){
-                              //  System.out.println("Same");
                                 column++;
                                 if (j == (search.size() - 1)){
                                     return row;
                                 }
                             }
                             else{
-                                //System.out.println("Not Same");
                                 column--;
                                 row++;
                                 break;
@@ -54,13 +50,11 @@ public class Table {
                         catch (NumberFormatException e) {
                             if (search.get(column).compareTo((String) table.get(column_num_temp).get(row)) == 0){
                                 column++;
-                                //System.out.println("Same");
                                 if (j == (search.size() - 1)){
                                     return row;
                                 }
                             }
                             else{
-                                //System.out.println("Different");
                                 column--;
                                 row++;
                                 break;
@@ -75,30 +69,23 @@ public class Table {
                     }
                 }
                 else{
-                    //System.out.println("Not Same");
                     row++;
                 }
             }
             catch (NumberFormatException e) {
                 if (search.get(column).compareTo((String) table.get(column_num).get(row)) == 0){
-                    //System.out.println("Here 1");
-                    //System.out.println("Same");
                     column++;
                     for(int j = 1; j < search.size(); j++){
                         int column_num_temp = getColumnNumber(primary_id.get(j));
                         try {
-                            //System.out.println("Comparing: " + search.get(column));
-                            //System.out.println("To: " + table.get(column_num_temp).get(row));
                             Integer.parseInt(search.get(column));
                             if (Integer.valueOf(search.get(column)) == table.get(column_num_temp).get(row)){
-                                //System.out.println("Same");
                                 column++;
                                 if (j == (search.size() - 1)){
                                     return row;
                                 }
                             }
                             else{
-                                //System.out.println("Not Same");
                                 column--;
                                 row++;
                                 break;
@@ -107,39 +94,33 @@ public class Table {
                         catch (NumberFormatException s) {
                             if (search.get(column).compareTo((String) table.get(column_num_temp).get(row)) == 0){
                                 column++;
-                                //System.out.println("Same");
                                 if (j == (search.size() - 1)){
                                     return row;
                                 }
                             }
                             else{
-                                //System.out.println("Different11");
-                                //System.out.println("i" + i + "total rows" + total_row);
                                 row++;
                                 column--;
                                 break;
                             }
                         }
                         if (j == (search.size() - 1)){
-                            //System.out.println("Here Exit");
                             return row;
                         }
                     }
                     if (search.size() == 1){
-                        //System.out.println("Here Exit2");
                         return row;
                     }
                 }
                 else{
-                    //System.out.println("Different");
                     row++;
                 }
             }
         }
-        //System.out.println("Exit");
         return row;
     }
 
+    //THIS FUNCTION TAKES IN THE DATA OF A ROW IN THE FORM OF A LIST OF OBJECTS AND RETURNS THE INDEX OF THE ROW THAT IT EXISTS AT IN THE TABLE
     public int getRowIndex(List<Object> row_to_look_for){
         int row = -1;
         int columns = table.size();
@@ -171,6 +152,8 @@ public class Table {
         }
         System.out.println();
     };
+
+    //THIS RETURNS A LIST OF OBJECTS AT A CERTAIN ROW INDEX IN THE TABLE AKA THE ROW IN THE FORM OF A LIST OF OBJECTS
     public List<Object> dataReturn (int index){
         List<Object> row = new ArrayList<>();
         for (int j = 0; j < column_name.size(); j++){
@@ -243,28 +226,28 @@ public class Table {
         return index_list;
     }
 
+
+    //THIS FUNCTION GOES THROUGH THE TABLE AT A COLUMN AND SEARCHES FOR A PARTICULAR VALUE AND RETURNS THE INDICES IN THE FORM OF A LIST
     public List<Integer> findIndicies(int column_num, String find){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
         for(int j =0; j < total_row; j++){
             try {
-                //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
                 Integer.parseInt(find);
                 if (Integer.valueOf(find) == table.get(column_num).get(j)){
-                    //System.out.println("Same");
                     index_list.add(j);
                 }
             }
             catch (NumberFormatException e) {
                 if (find.compareTo((String) table.get(column_num).get(j)) == 0){
                     index_list.add(j);
-                    //System.out.println("Same");
                 }
             }
         }
         return index_list;
     }
 
+    //THIS FUNCTION TAKES TWO COLUMNS AND RETURNS THE INDICES WHERE THE COLUMNS ARE EQUAL
     public List<Integer> findIndicies_columns(int column_num, int column_num_2){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
@@ -276,28 +259,27 @@ public class Table {
         return index_list;
     }
 
+    //FINDS ALL THE INDICES THAT DON'T HAVE THE OBJECT FINS IN THE COLUMN WITH THE COLUMN NUM
     public List<Integer> findAllButIndicies(int column_num, String find){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
         for(int j =0; j < total_row; j++){
             try {
-                //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
                 Integer.parseInt(find);
                 if (Integer.valueOf(find) != table.get(column_num).get(j)){
-                    //System.out.println("Same");
                     index_list.add(j);
                 }
             }
             catch (NumberFormatException e) {
                 if (find.compareTo((String) table.get(column_num).get(j)) != 0){
                     index_list.add(j);
-                    //System.out.println("Same");
                 }
             }
         }
         return index_list;
     }
 
+    //DOES THE SAME THING AS FINDALLBUTINDICIES BUT COMPARES 2 COLUMNS
     public List<Integer> findAllButIndicies_column(int column_num, int column_num2){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
@@ -309,6 +291,7 @@ public class Table {
         return index_list;
     }
 
+    //FIND ALL THE INDICES GIVEN A COMPARISON OPERATOR GIVEN A COLUMN AND AN OBJECT IN THE COLUMN CALLED FIND
     public List<Integer> findIndiciesCompare(int column_num, String find, String op){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
@@ -338,8 +321,6 @@ public class Table {
             }
             catch (NumberFormatException e) { //is string
                 if (op.equals(">=")){
-                    //System.out.println(">= string");
-                    //System.out.println(find.compareTo((String) table.get(column_num).get(j)));
                     if (find.compareTo((String) table.get(column_num).get(j)) <= 0){
                         index_list.add(j);
                     }
@@ -364,6 +345,8 @@ public class Table {
         return index_list;
     }
 
+
+    //DOES THE SAME THING AS FIND INDICIES COMPARE JUST COMPARING TWO COLUMNS IN THE SAME ROW
     public List<Integer> findIndiciesCompare_column(int column_num, int column_num2, String op){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
@@ -393,6 +376,7 @@ public class Table {
     }
 
 
+    //SHOWS THE TABLE VISUALLY
     public void printTable(){
         int total_rows = table.get(0).size();
         int total_columns = column_name.size();
@@ -406,7 +390,6 @@ public class Table {
             }
         }
         System.out.println();
-        //System.out.println("-----------------------------");
         for (int k=0; k < total_rows; k++){
             for (int i = 0; i < total_columns; i++) {
                 if(i  == total_columns -1){
@@ -419,4 +402,5 @@ public class Table {
             System.out.println();
         }
     }
+
 }

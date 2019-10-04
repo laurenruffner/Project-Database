@@ -23,7 +23,6 @@ common_names <- project (name) (select (aname == name && akind != kind) (a * ani
 answer <- common_names;
 
 SHOW answer;
-
 WRITE animals;
 CLOSE animals;
 EXIT;
