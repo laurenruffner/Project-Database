@@ -135,9 +135,7 @@ public class Table {
                     row++;
                 }
             }
-
         }
-
         //System.out.println("Exit");
         return row;
     }
@@ -266,6 +264,18 @@ public class Table {
         }
         return index_list;
     }
+
+    public List<Integer> findIndicies_columns(int column_num, int column_num_2){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j =0; j < total_row; j++){
+            if (table.get(column_num_2).get(j).equals(table.get(column_num).get(j))){
+                index_list.add(j);
+            }
+        }
+        return index_list;
+    }
+
     public List<Integer> findAllButIndicies(int column_num, String find){
         List<Integer> index_list = new ArrayList<>();
         int total_row = table.get(0).size();
@@ -283,6 +293,17 @@ public class Table {
                     index_list.add(j);
                     //System.out.println("Same");
                 }
+            }
+        }
+        return index_list;
+    }
+
+    public List<Integer> findAllButIndicies_column(int column_num, int column_num2){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j =0; j < total_row; j++){
+            if (!(table.get(column_num2).get(j).equals(table.get(column_num).get(j)))){
+                index_list.add(j);
             }
         }
         return index_list;
@@ -343,18 +364,57 @@ public class Table {
         return index_list;
     }
 
+    public List<Integer> findIndiciesCompare_column(int column_num, int column_num2, String op){
+        List<Integer> index_list = new ArrayList<>();
+        int total_row = table.get(0).size();
+        for(int j = 0; j < total_row; j++){
+            if (op.equals(">=")){
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) <= 0) {
+                    index_list.add(j);
+                }
+            }
+            else if (op.equals("<=")) {
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) >= 0) {
+                    index_list.add(j);
+                }
+            }
+            else if (op.equals(">")) {
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) < 0) {
+                    index_list.add(j);
+                }
+            }
+            else if (op.equals("<")) {
+                if (table.get(column_num2).get(j).toString().compareTo(table.get(column_num).get(j).toString()) > 0) {
+                    index_list.add(j);
+                }
+            }
+        }
+        return index_list;
+    }
+
 
     public void printTable(){
         int total_rows = table.get(0).size();
         int total_columns = column_name.size();
-        System.out.println("--------------------" + table_name + "---------------");
+        System.out.println("----------- " + table_name + " -----------");
         for (int j=0; j< column_name.size(); j++){
-            System.out.print("|" + column_name.get(j) + "|");
+            if (j == column_name.size()-1){
+                System.out.print( column_name.get(j));
+            }
+            else {
+                System.out.print(column_name.get(j) + " | ");
+            }
         }
         System.out.println();
+        //System.out.println("-----------------------------");
         for (int k=0; k < total_rows; k++){
             for (int i = 0; i < total_columns; i++) {
-                System.out.print("|" + table.get(i).get(k) + "|" );
+                if(i  == total_columns -1){
+                    System.out.print(table.get(i).get(k));
+                }
+                else {
+                    System.out.print(table.get(i).get(k) + " | ");
+                }
             }
             System.out.println();
         }
