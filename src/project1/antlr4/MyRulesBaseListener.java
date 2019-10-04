@@ -3,12 +3,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import project1.Dbms;
 import project1.Table;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.*;
-import java.util.List;
-import java.io.*;
 
 public class MyRulesBaseListener extends RulesBaseListener {
     Dbms myDbms;
@@ -17,7 +15,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     Stack<String> OperatorStack;
     List<String> PostFix;
 
-    //STUFF FOR DIJKSTRA'S SHUNTING YARD ALGORITHM
+    //Sets precedence for DIJKSTRA'S SHUNTING YARD ALGORITHM
     private enum Operator {
         AND(2), OR(2), EQUALS(1), NOTEQUALS(1), GREATER(1), LESS(1), GREATEREQUAL(1), LESSEQUAL(1),
         ADD(3), SUBTRACT(3), MULTIPLY(3);
@@ -43,7 +41,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }};
 
     private static boolean isHigherPrec(String op, String sub) {
-        //System.out.println("Greater" +  (boolean) (ops.get(sub).precedence >= ops.get(op).precedence));
         return (ops.containsKey(sub) && ops.get(sub).precedence >= ops.get(op).precedence);
     }
 
@@ -52,10 +49,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
             PostFix.clear();
         }
         for (String condition : ConditionList) {
-            //System.out.println("Condition: " + condition);
-            //System.out.println("Operator Stack: " + OperatorStack);
-            //System.out.println("PostFix Form: " + PostFix);
-
             if (ops.containsKey(condition)) {
                 //Higher Precedence Operator going on stack
                 if ((!OperatorStack.isEmpty()) && isHigherPrec(condition, OperatorStack.peek())) {
@@ -98,7 +91,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     //Recursion that retrieves the leaf nodes
     private void getLeafNodes(ParseTree node) {
         if (node.getChildCount() == 0) {
-            //System.out.println(node.getText());
             if (node.getText().compareTo("\"") != 0) {
                 ConditionList.add(node.getText());
             }
@@ -138,19 +130,15 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     table_index = myDbms.indexOfTable(table_name);
                     String[] arrOfStr = str.split(" \\| ", -2);
                     for (String a : arrOfStr) {
-                        //System.out.println(a);
                         columns.add(a);
                     }
-                    //System.out.println(columns);
                 } else if(line_num == 2){
                     String[] arrOfStr = str.split(" \\| ", -2);
                     for (String a : arrOfStr) {
-                        //System.out.println(a);
                         data.add(a);
                     }
                     for (int i=0; i < data.size(); i++){
                         try {
-                            //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
                             Integer.parseInt(data.get(i));
                             myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i),"INTEGER");
                             myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
@@ -171,7 +159,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     }
                     for (int i=0; i < data.size(); i++){
                         try {
-                            //System.out.println("Comparing: " + find + " to: " + table.get(column_num).get(j));
                             Integer.parseInt(data.get(i));
                             myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
                             column_count++;
@@ -262,7 +249,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 fw.write("\n");
             }
             fw.close();
-            myDbms.table_list.remove(index);//remove table from myDbms object
+            myDbms.table_list.remove(index); //remove table from myDbms object
             myDbms.table_names.remove(index);
         }
         catch(Exception e){
@@ -276,10 +263,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitShow_cmd(RulesParser.Show_cmdContext ctx) {
-        //System.out.println("***********************************SHOW CMD********************************************");
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
-
 
         if (myDbms.indexOfTable(table_name) != -1) {
             int index = myDbms.indexOfTable(table_name);
@@ -293,12 +278,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
     @Override
     public void exitInsert_cmd(RulesParser.Insert_cmdContext ctx) {
         //CURRENTLY DOES NOTHING WITH THE SECOND CASE OF INSERT JUST DEALS WITH CREATING THE TABLES
-
-        //System.out.println("**********************************INSERT CMD**************************************");
         count_inserts++;
         List<ParseTree> children = ctx.children;
         int children_size = children.size();
-        //System.out.println("Table Name: " + children.get(1).getText());
         int table_index = myDbms.indexOfTable(children.get(1).getText());
         int count = 0;
 
@@ -323,7 +305,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         } else {
             // table_index -> index of the table inserting into
             // table is the table that we are taking the data from
-            //System.out.println(myDbms.table_names.get(table_index));
             Table table = myDbms.temp_table_stack.pop();
             int table_columns = table.table.size();
             int table_rows = table.table.get(0).size();
@@ -337,8 +318,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     }
                 }
             }
-
-            //myDbms.table_list.get(table_index).printTable();
         }
 
         //TEST TO FIND PRIMARY ID Info -- It works
@@ -352,7 +331,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitProduct(RulesParser.ProductContext ctx) {
-        //System.out.println("Exit Product*******************");
         List<ParseTree> children = ctx.children;
         Table table1 = null;
         Table table2 = null;
@@ -374,7 +352,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitDifference(RulesParser.DifferenceContext ctx) {
-        //System.out.println("Exit Difference________________");
         List<ParseTree> children = ctx.children;
         Table table1 = null;
         Table table2 = null;
@@ -396,7 +373,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
     @Override public void exitUnion(RulesParser.UnionContext ctx) {
-        //System.out.println("Exit Union++++++++++++++++");
         List<ParseTree> children = ctx.children;
         Table table1 = null;
         Table table2 = null;
@@ -419,16 +395,13 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitCreate_cmd(RulesParser.Create_cmdContext ctx) {
-        //System.out.println("**********************************CREATE CMD*******************************************");
         int table_index = myDbms.emptyTableLocation();
 
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
         myDbms.createTable(table_name);
-        //myDbms.getTableName();
 
         //This fills the Primary Key into the ArrayList of strings called Primary ID
-
         ParseTree primary_key = children.get(7);
         int primary_key_num = children.get(7).getChildCount();
 
@@ -445,7 +418,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
 
         //This adds the proper columns due to what the attribute list includes
-
         ParseTree new_tree = children.get(3);
         int children_num = children.get(3).getChildCount();
 
@@ -462,11 +434,9 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 count++;
             } else if (count == 1 && i == (children_num - 1) && new_tree.getChild(i).getChildCount() > 1) {
                 type = new_tree.getChild(i).getChild(0).getText();
-                //System.out.println("End of attribute lists-------------");
                 myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
             } else if (count == 1 && i == (children_num - 1)) {
                 type = new_tree.getChild(i).getText();
-                //System.out.println("End of attribute lists-------------");
                 myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
             } else if (count == 1 && new_tree.getChild(i).getChildCount() > 1) {
                 type = new_tree.getChild(i).getChild(0).getText();
@@ -475,13 +445,11 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 type = new_tree.getChild(i).getText();
                 count++;
             } else if (count == 2 && new_tree.getChild(i).getText().compareTo(",") == 0) {
-                //System.out.println("There's another Attribute ----------");
                 myDbms.table_list.get(table_index).enterColumns(attr_iteration, name, type);
                 count = 0;
                 attr_iteration++;
             }
             i++;
-            //System.out.println("Name: " + name + " Type: " + type);
         }
         //System.out.println("Get columns from table: " + myDbms.table_names.get(table_index));
         //myDbms.table_list.get(table_index).getColumnNames();
@@ -491,20 +459,15 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     @Override
     public void exitSelection(RulesParser.SelectionContext ctx) {
-        //System.out.println("*************************SELECT********************************");
         List<ParseTree> children = ctx.children;
 
-        //System.out.println(ConditionList);
         postfix();
-        //System.out.println(PostFix);
         String table_name = children.get(4).getText();
         int table_index = myDbms.indexOfTable(table_name);
-        //System.out.println(table_name + " " + table_index);
         if (table_index == -1){
             Table workon = myDbms.temp_table_stack.pop();
             for (int i = 0; i < PostFix.size(); i++) {
                 String element = PostFix.get(i);
-                //System.out.println("Element: " + element );
                 if (element.equals("&&") || element.equals("||")) {
                     //tables and more tables
                     if (element.equals("&&")) {
@@ -516,8 +479,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 } else if (ops.containsKey(PostFix.get(i))) {
                     String operand1 = PostFix.get(i - 2);
                     String operand2 = PostFix.get(i - 1);
-                    //System.out.println("Operand1: " + operand1);
-                    //System.out.println("Operand2: " + operand2);
                     if (element.equals("==")) {
                         myDbms.equality_from_temp(operand1, operand2, workon);
                     } else if (element.equals("!=")) {
@@ -537,7 +498,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
         else {
             for (int i = 0; i < PostFix.size(); i++) {
                 String element = PostFix.get(i);
-                //System.out.println("Element: " + element );
                 if (element.equals("&&") || element.equals("||")) {
                     //tables and more tables
                     if (element.equals("&&")) {
@@ -549,8 +509,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 } else if (ops.containsKey(PostFix.get(i))) {
                     String operand1 = PostFix.get(i - 2);
                     String operand2 = PostFix.get(i - 1);
-                    //System.out.println("Operand1: " + operand1);
-                    //System.out.println("Operand2: " + operand2);
                     if (element.equals("==")) {
                         myDbms.equality(operand1, operand2, table_name);
                     } else if (element.equals("!=")) {
@@ -579,40 +537,27 @@ public class MyRulesBaseListener extends RulesBaseListener {
             int index_of_table_cloning = myDbms.indexOfTable(children.get(2).getText());
             Table new_table = myDbms.clone_table(myDbms.table_list.get(index_of_table_cloning));
             new_table.table_name = new_table_name;
-            //new_table.printTable();
             myDbms.table_list.add(new_table);
             myDbms.table_names.add(new_table_name);
-            //int index_of_new_table = myDbms.indexOfTable(new_table_name);
-            //System.out.println(index_of_new_table);
-            //myDbms.table_list.get(index_of_new_table).printTable();
         }
         else{
             Table old_table = myDbms.temp_table_stack.pop();
             old_table.table_name = new_table_name;
-            //old_table.printTable();
             myDbms.table_list.add(old_table);
             myDbms.table_names.add(new_table_name);
             int index_of_new_table = myDbms.indexOfTable(new_table_name);
-            //System.out.println(index_of_new_table);
-            //myDbms.table_list.get(index_of_new_table).printTable();
-
         }
 
     }
 
     @Override
     public void exitUpdate_cmd(RulesParser.Update_cmdContext ctx) {
-        //System.out.println("************Exit Update Cmd******************");
-
         List<ParseTree> children = ctx.children;
-        //System.out.println(ConditionList);
         postfix();
-        //System.out.println(PostFix);
+
         String table_name = children.get(1).getText();
-        //System.out.println(table_name);
         for (int i = 0; i < PostFix.size(); i++) {
             String element = PostFix.get(i);
-            //System.out.println("Element: " + element );
             if (element.equals("&&") || element.equals("||")) {
                 //tables and more tables
                 if (element.equals("&&")) {
@@ -643,10 +588,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
         int main_table_index = myDbms.indexOfTable(table_name);
         Table change_elements = myDbms.temp_table_stack.pop();
-        //System.out.println("Change these rows: ");
-        //change_elements.printTable();
-        //System.out.println("FROM: ");
-        //myDbms.table_list.get(main_table_index).printTable();
+
         int rows = change_elements.table.get(0).size();
         int columns = change_elements.table.size();
         for (int k = 0; k < rows; k++) {
@@ -680,29 +622,19 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count = 0;
                 }
             }
-
         }
-        //System.out.println("NOW: ");
-        //myDbms.table_list.get(main_table_index).printTable();
-
         ConditionList.clear();
         PostFix.clear();
     }
 
     @Override
     public void exitDelete_cmd(RulesParser.Delete_cmdContext ctx) {
-        //System.out.println("*************Exit Delete Cmd*****************");
         List<ParseTree> children = ctx.children;
-
-        //System.out.println(ConditionList);
         postfix();
-        //System.out.println(PostFix);
 
         String table_name = children.get(1).getText();
-        //System.out.println(table_name);
         for (int i = 0; i < PostFix.size(); i++) {
             String element = PostFix.get(i);
-            //System.out.println("Element: " + element );
             if (element.equals("&&") || element.equals("||")) {
                 //tables and more tables
                 if (element.equals("&&")) {
@@ -714,8 +646,6 @@ public class MyRulesBaseListener extends RulesBaseListener {
             } else if (ops.containsKey(PostFix.get(i))) {
                 String operand1 = PostFix.get(i - 2);
                 String operand2 = PostFix.get(i - 1);
-                //System.out.println("Operand1: " + operand1);
-                //System.out.println("Operand2: " + operand2);
                 if (element.equals("==")) {
                     myDbms.equality(operand1, operand2, table_name);
                 } else if (element.equals("!=")) {
@@ -733,11 +663,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
 
         Table delete_elements = myDbms.temp_table_stack.pop();
-        //System.out.println("Delete these rows: ");
-        //delete_elements.printTable();
         int main_table_index = myDbms.indexOfTable(table_name);
-        //System.out.println("FROM: ");
-        // myDbms.table_list.get(main_table_index).printTable();
         int rows = delete_elements.table.get(0).size();
         int columns = delete_elements.table.size();
         for (int k = 0; k < rows; k++) {
@@ -751,20 +677,14 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 myDbms.table_list.get(main_table_index).table.get(n).remove(index);
             }
         }
-        //System.out.println("NOW: ");
-        // myDbms.table_list.get(main_table_index).printTable();
-
         ConditionList.clear();
         PostFix.clear();
-
     }
 
 
     @Override
     public void exitCondition(RulesParser.ConditionContext ctx) {
-        //System.out.println("Exit Condition-----------------------");
         List<ParseTree> children = ctx.children;
-        //System.out.println(children.size());
         String relationName;
         if (children.size() > 1) {
             for (int i = 0; i < children.size(); i++) {
@@ -772,38 +692,28 @@ public class MyRulesBaseListener extends RulesBaseListener {
             }
         } else {
             ParseTree condition_node = children.get(0);
-            //System.out.println("Condition Node: " + condition_node.getText());
-            //System.out.println("\n\nStarting getLeafNodes ------------------------------------");
             getLeafNodes(condition_node);
         }
-        //System.out.println(ConditionList);
-        //System.out.println("Exiting leaf nodes \n\n");
     }
 
     @Override
     public void exitProjection(RulesParser.ProjectionContext ctx) {
-        //System.out.println("Exit Projection--------------");
         List<ParseTree> children = ctx.children;
         ParseTree new_tree = children.get(2);
         int children_num = children.get(2).getChildCount();
-        //System.out.println(children.get(4).getText());
 
         Table temp = myDbms.createTempTable();
 
         int count = 0;
         int column_number = 0;
-        //AKA  IT IS AN EXISTING TABLE NOT A JUNK VARIABLE
+        //Checks if table already exists
         if (myDbms.indexOfTable(children.get(4).getText()) != -1) {
-            //System.out.println("NOT A TEMP TABLE");
             int table_index = myDbms.indexOfTable(children.get(4).getText());
-            //myDbms.table_list.get(table_index).printTable();
             for (int i = 0; i < children_num; i++) {
                 if (count == 0) {
                     String column = new_tree.getChild(i).getText();
-                    //System.out.println(column);
                     int column_num = myDbms.table_list.get(table_index).getColumnNumber(column);
                     if (myDbms.table_list.get(table_index).table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")) {
-                        //System.out.println("Integer Column");
                         temp.enterColumns(column_number, column, "INTEGER");
                         for (int j = 0; j < myDbms.table_list.get(table_index).table.get(column_num).size(); j++) {
                             temp.insertData(column_number, Integer.toString((Integer) myDbms.table_list.get(table_index).table.get(column_num).get(j)), true);
@@ -821,22 +731,16 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count = 0;
                 }
             }
-            //System.out.println("The project was of a table that exists");
-            //temp.printTable();
             myDbms.temp_table_stack.push(temp);
         }
-        //temp.printTable();
         else {
-            //System.out.println("TEMP TABLE AS OUT");
             Table table = myDbms.temp_table_stack.pop();
-            //table.printTable();
             Table temp2 = myDbms.createTempTable();
             int count2 = 0;
             int column_number2 = 0;
             for (int i = 0; i < children_num; i++) {
                 if (count2 == 0) {
                     String column = new_tree.getChild(i).getText();
-                    //System.out.println(column);
                     int column_num = table.getColumnNumber(column);
                     if (table.table.get(column_num).get(0).getClass().getSimpleName().equals("Integer")) {
                         temp2.enterColumns(column_number2, column, "INTEGER");
@@ -856,15 +760,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     count2 = 0;
                 }
             }
-            //System.out.println("The project was of a temp table");
-            //temp2.printTable();
             myDbms.temp_table_stack.push(temp2);
         }
     }
 
     @Override
     public void exitRenaming(RulesParser.RenamingContext ctx) {
-        //System.out.println("Exit Renaming**************************");
         List<ParseTree> children = ctx.children;
 
         String table_name = children.get(4).getText();
@@ -881,17 +782,14 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 myDbms.table_list.get(table_index).column_name.set(i, new_tree.getChild(count).getText());
                 count += 2;
             }
-            //myDbms.table_list.get(table_index).printTable();
         } else {
             Table table = myDbms.temp_table_stack.pop();
-            //table.printTable();
             int columns = table.table.size();
             int count1 = 0;
             for (int i = 0; i < columns; i++) {
                 table.column_name.set(i, new_tree.getChild(count1).getText());
                 count1 += 2;
             }
-            //table.printTable();
             myDbms.temp_table_stack.push(table);
         }
     }
