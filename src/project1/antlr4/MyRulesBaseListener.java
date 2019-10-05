@@ -40,11 +40,14 @@ public class MyRulesBaseListener extends RulesBaseListener {
         put("*", Operator.MULTIPLY);
     }};
 
+    //checks if operator is higher precedence
     private static boolean isHigherPrec(String op, String sub) {
         return (ops.containsKey(sub) && ops.get(sub).precedence >= ops.get(op).precedence);
     }
 
+    //Puts the ConditionList in postfix form
     private void postfix() {
+        //makes sure Post Fix List is Empty
         if (!PostFix.isEmpty()) {
             PostFix.clear();
         }
@@ -111,10 +114,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
         PostFix = new ArrayList<>();
     }
 
+    //Reads in data from a file
     @Override public void exitOpen_cmd(RulesParser.Open_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
         try{
+            //reads in file
             String filename = "src/Files/" +  table_name  + ".db";
             BufferedReader in = new BufferedReader(new FileReader(filename));
             String str;
@@ -125,21 +130,23 @@ public class MyRulesBaseListener extends RulesBaseListener {
             List<String> data = new ArrayList<>();
             while ((str = in.readLine()) != null) {
                 if (line_num == 0) {
-                    myDbms.createTable(table_name);
-                } else if (line_num == 1) {
+                    myDbms.createTable(table_name); //creates Table
+                }
+                else if (line_num == 1) { //gets the columns for the Table
                     table_index = myDbms.indexOfTable(table_name);
                     String[] arrOfStr = str.split(" \\| ", -2);
                     for (String a : arrOfStr) {
                         columns.add(a);
                     }
-                } else if(line_num == 2){
+                }
+                else if(line_num == 2){ //gets data for each column
                     String[] arrOfStr = str.split(" \\| ", -2);
                     for (String a : arrOfStr) {
                         data.add(a);
                     }
                     for (int i=0; i < data.size(); i++){
                         try {
-                            Integer.parseInt(data.get(i));
+                            Integer.parseInt(data.get(i)); //inserts rows and columns into the Table
                             myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i),"INTEGER");
                             myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
                             column_count++;
@@ -152,7 +159,8 @@ public class MyRulesBaseListener extends RulesBaseListener {
                     }
                     column_count = 0;
                     data.clear();
-                } else{
+                }
+                else{
                     String[] arrOfStr = str.split(" \\| ", -2);
                     for (String a : arrOfStr) {
                         data.add(a);
@@ -181,17 +189,18 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
+    //Puts table into a new File
     @Override public void exitWrite_cmd(RulesParser.Write_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
         String tableName = children.get(1).getText(); //tableName will also be the file name
         int index = myDbms.indexOfTable(tableName);
         try {
             Table t = myDbms.table_list.get(index);
-            FileWriter fw = new FileWriter("src/Files/" + tableName + ".db");
+            FileWriter fw = new FileWriter("src/Files/" + tableName + ".db"); //Creates new File
             int total_rows = t.table.get(0).size();
             int total_columns = t.column_name.size();
             fw.write("----------- " + t.table_name + " -----------\n");
-            for (int j=0; j< t.column_name.size(); j++){
+            for (int j=0; j< t.column_name.size(); j++){  //Writes attribute for each column to file
                 if (j == t.column_name.size()-1){
                     fw.write(t.column_name.get(j));
                 }
@@ -200,7 +209,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 }
             }
             fw.write("\n");
-            for (int k=0; k < total_rows; k++){
+            for (int k=0; k < total_rows; k++){ //writes data from table to file
                 for (int i = 0; i < total_columns; i++) {
                     if(i  == total_columns -1){
                         fw.write(t.table.get(i).get(k)+"");
@@ -218,6 +227,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
+    //writes table to a new file and removes it from the List of Tables
     @Override public void exitClose_cmd(RulesParser.Close_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
         String tableName = children.get(1).getText(); //tableName will also be the file name
@@ -257,10 +267,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
+    //exit
     @Override public void exitExit_cmd(RulesParser.Exit_cmdContext ctx) {
         System.exit(0);
     }
 
+    //Prints out a Table
     @Override
     public void exitShow_cmd(RulesParser.Show_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
@@ -275,6 +287,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
+    //Inserts new data into a table
     @Override
     public void exitInsert_cmd(RulesParser.Insert_cmdContext ctx) {
         //CURRENTLY DOES NOTHING WITH THE SECOND CASE OF INSERT JUST DEALS WITH CREATING THE TABLES
@@ -330,6 +343,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 //        }
     }
 
+    //Creates temp table of Product of Two tables
     @Override public void exitProduct(RulesParser.ProductContext ctx) {
         List<ParseTree> children = ctx.children;
         Table table1 = null;
@@ -351,6 +365,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         myDbms.product(table1,table2);
     }
 
+    //Creates a new table from the difference of two given tables
     @Override public void exitDifference(RulesParser.DifferenceContext ctx) {
         List<ParseTree> children = ctx.children;
         Table table1 = null;
@@ -372,6 +387,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         myDbms.difference(table1,table2);
     }
 
+    //Joins two tables into One
     @Override public void exitUnion(RulesParser.UnionContext ctx) {
         List<ParseTree> children = ctx.children;
         Table table1 = null;
@@ -393,6 +409,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         myDbms.union(table1,table2);
     }
 
+    //Creates a new Table
     @Override
     public void exitCreate_cmd(RulesParser.Create_cmdContext ctx) {
         int table_index = myDbms.emptyTableLocation();
@@ -457,6 +474,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
     }
 
 
+    //selects data from a Table based on given conditions
     @Override
     public void exitSelection(RulesParser.SelectionContext ctx) {
         List<ParseTree> children = ctx.children;
@@ -529,10 +547,12 @@ public class MyRulesBaseListener extends RulesBaseListener {
         PostFix.clear();
     }
 
+    //adds newly created table to List of Tables
     @Override public void exitQuery(RulesParser.QueryContext ctx) {
         List<ParseTree> children = ctx.children;
         String relationName;
         String new_table_name = children.get(0).getText();
+        //checks if Table already exists
         if (myDbms.indexOfTable(children.get(2).getText()) != -1){
             int index_of_table_cloning = myDbms.indexOfTable(children.get(2).getText());
             Table new_table = myDbms.clone_table(myDbms.table_list.get(index_of_table_cloning));
@@ -540,6 +560,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
             myDbms.table_list.add(new_table);
             myDbms.table_names.add(new_table_name);
         }
+        //pops temp table from stack
         else{
             Table old_table = myDbms.temp_table_stack.pop();
             old_table.table_name = new_table_name;
@@ -550,6 +571,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     }
 
+    //Changes table data depending on a given condition
     @Override
     public void exitUpdate_cmd(RulesParser.Update_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
@@ -627,6 +649,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         PostFix.clear();
     }
 
+    //Deletes attributes from a table
     @Override
     public void exitDelete_cmd(RulesParser.Delete_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
@@ -696,6 +719,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
+    //creates temp table of specific columns from given Table
     @Override
     public void exitProjection(RulesParser.ProjectionContext ctx) {
         List<ParseTree> children = ctx.children;
@@ -764,6 +788,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
+    //Renames columns in a Table
     @Override
     public void exitRenaming(RulesParser.RenamingContext ctx) {
         List<ParseTree> children = ctx.children;
@@ -772,6 +797,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         ParseTree new_tree = children.get(2);
         new_tree.getChildCount();
 
+        //checks if table exists
         if (myDbms.indexOfTable(table_name) != -1) {
             int table_index = myDbms.indexOfTable(table_name);
             int columns = myDbms.table_list.get(table_index).column_name.size();
@@ -782,15 +808,16 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 myDbms.table_list.get(table_index).column_name.set(i, new_tree.getChild(count).getText());
                 count += 2;
             }
-        } else {
-            Table table = myDbms.temp_table_stack.pop();
+        }
+        else {
+            Table table = myDbms.temp_table_stack.pop(); //gets temp table from the stack
             int columns = table.table.size();
             int count1 = 0;
             for (int i = 0; i < columns; i++) {
                 table.column_name.set(i, new_tree.getChild(count1).getText());
                 count1 += 2;
             }
-            myDbms.temp_table_stack.push(table);
+            myDbms.temp_table_stack.push(table); //pushes table onto stack
         }
     }
 
