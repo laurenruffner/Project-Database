@@ -42,16 +42,24 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     //checks if operator is higher precedence
     private static boolean isHigherPrec(String op, String sub) {
+        if (sub.equals("(")){
+            return true;
+        }
+        //System.out.println("Op:" + op + " Sub:" + sub);
         return (ops.containsKey(sub) && ops.get(sub).precedence >= ops.get(op).precedence);
     }
 
     //Puts the ConditionList in postfix form
     private void postfix() {
         //makes sure Post Fix List is Empty
+
+        //System.out.println(OperatorStack);
         if (!PostFix.isEmpty()) {
             PostFix.clear();
         }
         for (String condition : ConditionList) {
+            //System.out.println(PostFix);
+            //System.out.println(OperatorStack);
             if (ops.containsKey(condition)) {
                 //Higher Precedence Operator going on stack
                 if ((!OperatorStack.isEmpty()) && isHigherPrec(condition, OperatorStack.peek())) {
@@ -93,6 +101,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
 
     //Recursion that retrieves the leaf nodes
     private void getLeafNodes(ParseTree node) {
+        //System.out.println("getLeaf: "+  ConditionList);
         if (node.getChildCount() == 0) {
             if (node.getText().compareTo("\"") != 0) {
                 ConditionList.add(node.getText());
@@ -479,7 +488,10 @@ public class MyRulesBaseListener extends RulesBaseListener {
     public void exitSelection(RulesParser.SelectionContext ctx) {
         List<ParseTree> children = ctx.children;
 
+        //System.out.println(ConditionList);
         postfix();
+
+        //System.out.println(PostFix);
         String table_name = children.get(4).getText();
         int table_index = myDbms.indexOfTable(table_name);
         if (table_index == -1){
@@ -709,13 +721,33 @@ public class MyRulesBaseListener extends RulesBaseListener {
     public void exitCondition(RulesParser.ConditionContext ctx) {
         List<ParseTree> children = ctx.children;
         String relationName;
+        List<String> LeafNodes = new ArrayList<>();
         if (children.size() > 1) {
+            //System.out.println("Children: ");
             for (int i = 0; i < children.size(); i++) {
-                getLeafNodes(children.get(i));
+                getLeaves(children.get(i), LeafNodes);
             }
         } else {
+            //System.out.println("No Children: ");
             ParseTree condition_node = children.get(0);
-            getLeafNodes(condition_node);
+            getLeaves(condition_node, LeafNodes);
+        }
+        //System.out.println(LeafNodes);
+        ConditionList = LeafNodes;
+
+    }
+
+    private void getLeaves(ParseTree node, List<String> Leaves) {
+        //System.out.println("getLeaf: "+  ConditionList);
+        if (node.getChildCount() == 0) {
+            if (node.getText().compareTo("\"") != 0) {
+                Leaves.add(node.getText());
+            }
+        } else {
+            for (int i = 0; i < node.getChildCount(); i++) {
+                ParseTree child = node.getChild(i);
+                getLeaves(child, Leaves);
+            }
         }
     }
 

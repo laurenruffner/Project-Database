@@ -66,6 +66,9 @@ public class Dbms {
         Table temp1 = temp_table_stack.pop();
         Table temp2 = temp_table_stack.pop();
 
+        //temp1.printTable();
+        //temp2.printTable();
+
         create_empty_temp_clone(temp1);
         Table temp = temp_table_stack.pop();
         int columns1  = temp1.table.size();
@@ -457,14 +460,19 @@ public class Dbms {
 
     // Compares two operands using operator in temp table
     public void compares_from_temp(String operand1, String operand2, String operator, Table table){
+        //System.out.println("TABLE: ");
+        table.printTable();
         int index_column = table.getColumnNumber(operand1);
+        //System.out.println("index_column: " + index_column);
         List<Integer> index_list = new ArrayList<>();
-        if (table.getColumnNumber(operand1) !=  -1){
-            int index_column2 = table.getColumnNumber(operand1);
+        if (table.getColumnNumber(operand2) !=  -1){
+            //System.out.println("IN TABLE");
+            int index_column2 = table.getColumnNumber(operand2);
             index_list = table.findIndiciesCompare_column(index_column, index_column2, operator);
             create_empty_temp_clone(table);
             Table temp = temp_table_stack.pop();
             for (int i = 0; i < index_list.size(); i++) {
+                //System.out.println("IN SIZE");
                 for (int j = 0; j < table.table.size(); j++) {  //gives you the column size
                     if (table.table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) { //integer
                         int data = (Integer) table.table.get(j).get(index_list.get(i));
@@ -474,6 +482,7 @@ public class Dbms {
                         temp.insertData(j, data, false);
                     }
                 }
+                temp.printTable();
             }
             temp_table_stack.push(temp);
         }
@@ -481,6 +490,7 @@ public class Dbms {
             index_list = table.findIndiciesCompare(index_column, operand2, operator);
             create_empty_temp_clone(table);
             Table temp = temp_table_stack.pop();
+            System.out.println("");
             for (int i = 0; i < index_list.size(); i++) {
                 for (int j = 0; j < table.table.size(); j++) {  //gives you the column size
                     if (table.table.get(j).get(index_list.get(i)).getClass().getSimpleName().equals("Integer")) { //integer
