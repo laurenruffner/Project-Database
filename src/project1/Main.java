@@ -3,6 +3,7 @@ package project1;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -36,7 +37,6 @@ class Main{
         movies.enterColumns(8, "Budget", "INTEGER");
         movies.enterColumns(9,"Revenue", "INTEGER");
         movies.enterColumns(10, "Original_Language", "VARCHAR");
-        movies.enterColumns(11, "Description", "VARCHAR");
 
         Table cast = new Table("cast");
         cast.enterColumns(0, "Movie_ID", "INTEGER");
@@ -52,10 +52,27 @@ class Main{
         crew.enterColumns(4, "Job", "VARCHAR");
 
         for (int i=0; i < moviesList.size(); i++){
-            //M_id
             movies.insertData(0, Integer.toString(moviesList.get(i).getId()), true);
             //Title
-            movies.insertData(1, moviesList.get(i).getTitle(), false);
+
+            String string = Normalizer.normalize(moviesList.get(i).getTitle(), Normalizer.Form.NFD);
+            String title = string.replaceAll("[^\\p{ASCII}]", "");
+
+             title = title.replace("\"", "")
+                    .replace(",", "").replace("#","").replace("&", "and")
+                    .replace(":", "").replace(" (voice)" , "").replace(" (uncredited)", "")
+                    .replace("'", "").replace("!", "").replace(".", "")
+                    .replace("%", " percent").replace("·","").replace(" -","")
+                    .replace("-","").replace("?", "").replaceAll(" '\\.\\*'","")
+                    .replace(" ", "_").replace("@", "at");
+
+            if (title.equals("_")){
+                movies.insertData(1, "TITLE_NOT_IN_ALPHA_FORMAT", false);
+            }
+            else {
+                movies.insertData(1, title, false);
+            }
+
             //release date
             String date = moviesList.get(i).getRelease_date().replace("-", "");
             if (date.compareTo("") == 0 ){
@@ -64,29 +81,28 @@ class Main{
             else {
                 movies.insertData(2, date, true);
             }
-            //Genres
-            for (int j=0; j < 3; j++){
-                if (moviesList.get(i).getGenres().size() == 3){
-                    movies.insertData(3, moviesList.get(i).getGenres().get(0).getName(), false);
-                    movies.insertData(4, moviesList.get(i).getGenres().get(1).getName(), false);
-                    movies.insertData(5, moviesList.get(i).getGenres().get(2).getName(), false);
-                }
-                else if(moviesList.get(i).getGenres().size() == 2){
-                    movies.insertData(3, moviesList.get(i).getGenres().get(0).getName(), false);
-                    movies.insertData(4, moviesList.get(i).getGenres().get(1).getName(), false);
-                    movies.insertData(5, "NULL", false);
-                }
-                else if(moviesList.get(i).getGenres().size() == 1){
-                    movies.insertData(3, moviesList.get(i).getGenres().get(0).getName(), false);
-                    movies.insertData(4, "NULL", false);
-                    movies.insertData(5, "NULL", false);
-                }
-                else{
-                    movies.insertData(3, "NULL", false);
-                    movies.insertData(4, "NULL", false);
-                    movies.insertData(5, "NULL", false);
 
-                }
+            //Genres
+            if (moviesList.get(i).getGenres().size() == 3){
+                movies.insertData(3, moviesList.get(i).getGenres().get(0).getName().replace(" ", "_"), false);
+                movies.insertData(4, moviesList.get(i).getGenres().get(1).getName().replace(" ", "_"), false);
+                movies.insertData(5, moviesList.get(i).getGenres().get(2).getName().replace(" ", "_"), false);
+            }
+            else if(moviesList.get(i).getGenres().size() == 2){
+                movies.insertData(3, moviesList.get(i).getGenres().get(0).getName().replace(" ", "_"), false);
+                movies.insertData(4, moviesList.get(i).getGenres().get(1).getName().replace(" ", "_"), false);
+                movies.insertData(5, "NULL", false);
+            }
+            else if(moviesList.get(i).getGenres().size() == 1){
+                movies.insertData(3, moviesList.get(i).getGenres().get(0).getName().replace(" ", "_"), false);
+                movies.insertData(4, "NULL", false);
+                movies.insertData(5, "NULL", false);
+            }
+            else{
+                movies.insertData(3, "NULL", false);
+                movies.insertData(4, "NULL", false);
+                movies.insertData(5, "NULL", false);
+
             }
             //Runtime
             movies.insertData(6, Integer.toString(moviesList.get(i).getRuntime()), true);
@@ -98,15 +114,6 @@ class Main{
             movies.insertData(9, Integer.toString((int)moviesList.get(i).getRevenue()), true);
             //Original Language
             movies.insertData(10, moviesList.get(i).getOriginal_language(), false);
-            //Description
-
-            String description = moviesList.get(i).getOverview().replace("|", "/");
-            if (description.compareTo("")==0){
-                movies.insertData(11, "NULL", false);
-            }
-            else {
-                movies.insertData(11, description, false);
-            }
 
             for (int l = 0; l < creditsList.get(i).getCastMember().size(); l++){
                 String characters = creditsList.get(i).getCastMember().get(l).getCharacter().replace("|", "/");
@@ -114,18 +121,35 @@ class Main{
                 for (String charact : arrofCharacters) {
                     //movie id
                     cast.insertData(0, creditsList.get(i).getId(), true);
+
                     //ID
                     cast.insertData(1, Integer.toString(creditsList.get(i).getCastMember().get(l).getId()), true);
+
                     //Name
-                    cast.insertData(2, creditsList.get(i).getCastMember().get(l).getName(), false);
+                    String name = Normalizer.normalize(creditsList.get(i).getCastMember().get(l).getName(), Normalizer.Form.NFD);
+                    name = name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
+                            .replace(" ", "_").replace(".", "").replace("'", "");
+                    cast.insertData(2, name, false);
+
                     //Character
                     if (charact.compareTo("") == 0) {
                         cast.insertData(3, "NULL", false);
                     } else {
+                        //Remove after Comma
+                        if (charact.contains(", Jr")){
+                            charact = charact.replace(",", "");
+                        }
+                        else {
+                            charact = charact.split(",")[0].split(" \\(")[0];
+                        }
+
+                        charact = Normalizer.normalize(charact, Normalizer.Form.NFD);
+                        charact = charact.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
+                                .replace(" ", "_").replace(".", "").replace("'", "");
+
                         cast.insertData(3, charact, false);
                     }
                 }
-
             }
             for (int m=0; m < creditsList.get(i).getCrewMember().size(); m++){
                 //movie id
@@ -150,61 +174,61 @@ class Main{
         //PUT THE INPUTS HERE
         //DEPENDING ON INPUTS IT CREATES AN INPUT.TXT
 
-        boolean query1 = false;
-        boolean query2 = false;
+
+
+
+
+
+
+
+
         boolean query3 = false;
-        boolean query4 = true;
+        boolean query4 = false;
         boolean query5 = false;
 
 
-        String Character_Name_Q4 = "Woody (voice)"; //Eventually this will be input from GUI
+        String Character_Name_Q4 = "Harry_Potter"; //Eventually this will be input from GUI
 
-        //QUERY1
-        if(query1){
 
-        }
-        //QUERY2
-        else if(query2){
-
-        }
-        //QUERY3
-        else if(query3){
+        if(query3){
 
         }
         //QUERY4
         else if(query4){
 
-//            File file = new File("src/Files/input_query4.txt");
-//
-//            String fileContent = "OPEN movies;\n" +
-//                    "OPEN cast;\n" +
-//                    "actors <- select (Character == \"" + Character_Name_Q4 + "\") cast;\n" +
-//                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actors);\n" +
-//                    "movie_actor <- project (Title, Name) actor_and_movies;";
-//
-//            FileWriter fileWriter = new FileWriter("src/Files/input_query4.txt");
-//            fileWriter.write(fileContent);
-//            fileWriter.close();
-//
-//            File query_4_file = new File("src/Files/input_query4.txt");
-//            Scanner scanner = new Scanner(query_4_file);
-//            List<String> lines = new ArrayList<>();
-//            while (scanner.hasNextLine()) {
-//                String line = scanner.nextLine();
-//                if (line.length() != 0) { lines.add(line); }
-//            }
-//            MyRulesBaseListener listener = new MyRulesBaseListener();
-//            for (String line : lines) {
-//                CharStream charStream = CharStreams.fromString(line);
-//                RulesLexer lexer = new RulesLexer(charStream);
-//                CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-//                RulesParser parser = new RulesParser(commonTokenStream);
-//                lexer.removeErrorListeners();
-//                parser.removeErrorListeners();
-//                RulesParser.ProgramContext programContext = parser.program();
-//                ParseTreeWalker walker = new ParseTreeWalker();
-//                walker.walk(listener, programContext);
-//            }
+            String character_name = Character_Name_Q4.replace(" ", "_");
+            File file = new File("src/Files/input_query4.txt");
+
+            String fileContent = "OPEN movies;\n" +
+                    "OPEN cast;\n" +
+                    "actors <- select (Character == \"" + character_name + "\") cast;\n" +
+                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actors);\n" +
+                    "movie_actor <- project (Title, Name) actor_and_movies;" +
+                    "SHOW movie_actor;";
+
+            FileWriter fileWriter = new FileWriter("src/Files/input_query4.txt");
+            fileWriter.write(fileContent);
+            fileWriter.close();
+
+            File query_4_file = new File("src/Files/input_query4.txt");
+            Scanner scanner = new Scanner(query_4_file);
+            List<String> lines = new ArrayList<>();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() != 0) { lines.add(line); }
+            }
+            MyRulesBaseListener listener = new MyRulesBaseListener();
+            for (String line : lines) {
+                CharStream charStream = CharStreams.fromString(line);
+                RulesLexer lexer = new RulesLexer(charStream);
+                CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+                RulesParser parser = new RulesParser(commonTokenStream);
+                lexer.removeErrorListeners();
+                parser.removeErrorListeners();
+                RulesParser.ProgramContext programContext = parser.program();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(listener, programContext);
+            }
 
         }
         //QUERY5

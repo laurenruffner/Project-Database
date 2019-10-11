@@ -98,7 +98,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         }
     }
 
-    ;
+
 
     //Recursion that retrieves the leaf nodes
     private void getLeafNodes(ParseTree node) {

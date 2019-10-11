@@ -231,7 +231,12 @@ public class Dbms {
 
     // Operation function for "=="
     public void equality(String operand1, String operand2, String table_name){
+
+        System.out.println(table_name);
+        System.out.println(operand1);
+        System.out.println(operand2);
         int index_table = indexOfTable(table_name);
+        System.out.println(index_table);
         int index_column = table_list.get(index_table).getColumnNumber(operand1);
         List<Integer> index_list = new ArrayList<>();
         if(table_list.get(index_table).getColumnNumber(operand2) != -1){
@@ -510,9 +515,12 @@ public class Dbms {
     public void product(Table table_name1, Table table_name2) {
         Table temp1 = table_name1;
         Table temp2 = table_name2;
+        //System.out.println("Table1: " + table_name1.table_name + " Table 2: " + table_name2.table_name);
 
         create_empty_temp_clone(temp1);
         Table temp = temp_table_stack.pop();
+
+
         int amountToADD = temp2.column_name.size();
         int addColumnIndex = temp.column_name.size() - 1;
         for (int i = 0; i < amountToADD; i++) {
@@ -525,15 +533,19 @@ public class Dbms {
                 temp.enterColumns(addColumnIndex,temp2.column_name.get(i), "INTEGER");
             }
         }
+        temp.printTable();
 
         int columns1 = temp1.table.size();
         int columns2 = temp2.table.size();
         int rows1 = temp1.table.get(0).size();
         int rows2 = temp2.table.get(0).size();
+        System.out.println(rows1*rows2);
         for(int m = 0; m < rows2; m++) {
-
             for (int i = 0; i < rows1; i++) {
                 List<Object> row_of_temp1 = new ArrayList<>();
+
+                //System.out.println(columns1);
+                //System.out.println(rows1);
                 for (int j = 0; j < columns1; j++) {
                     row_of_temp1.add(temp1.table.get(j).get(i));
                 }
@@ -541,11 +553,11 @@ public class Dbms {
                 for (int l = 0; l < columns2; l++) {
                     row_of_temp1.add(temp2.table.get(l).get(m));
                 }
-
+                //System.out.println(row_of_temp1);
                 for(int z = 0; z < row_of_temp1.size(); z++) {
                     boolean integerData = row_of_temp1.get(z).getClass().getSimpleName().equals("Integer");
                     if (!integerData) {
-                        temp.insertData(z, (String) row_of_temp1.get(z), false);
+                        temp.insertData(z, row_of_temp1.get(z).toString(), false);
                     } else {
                         temp.insertData(z, Integer.toString((Integer) row_of_temp1.get(z)), true);
 
@@ -561,6 +573,7 @@ public class Dbms {
             Table temp = createTempTable();
             for (int i = 0; i < table.column_name.size(); i++){
                 String type = table.table.get(i).get(0).getClass().getSimpleName();
+                //System.out.println("Type: " + type +  " Column Name: " + table.column_name.get(i));
                 if (type.equals("String")){ // is string
                     temp.enterColumns(i,table.column_name.get(i), "VARCHAR");
                 }
@@ -579,7 +592,7 @@ public class Dbms {
                     temp.insertData(i, input , true);
                 }
                 else{
-                    String data = (String) table.table.get(i).get(j);
+                    String data = table.table.get(i).get(j).toString();
                     temp.insertData(i, data , false);
                 }
             }
