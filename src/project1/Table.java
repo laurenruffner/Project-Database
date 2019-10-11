@@ -3,6 +3,7 @@ package project1;
 
 
 import javax.json.*;
+import java.io.FileWriter;
 import java.util.*;
 
 public class Table {
@@ -400,6 +401,40 @@ public class Table {
                 }
             }
             System.out.println();
+        }
+    }
+
+    //Moving the take to a file
+    public void table_to_file(){
+        try {
+            FileWriter fw = new FileWriter("src/Files/" + table_name + ".db"); //Creates new File
+            int total_rows = table.get(0).size();
+            int total_columns = column_name.size();
+            fw.write("----------- " + table_name + " -----------\n");
+            for (int j=0; j< column_name.size(); j++){  //Writes attribute for each column to file
+                if (j == column_name.size()-1){
+                    fw.write(column_name.get(j));
+                }
+                else {
+                    fw.write(column_name.get(j) + " | ");
+                }
+            }
+            fw.write("\n");
+            for (int k=0; k < total_rows; k++){ //writes data from table to file
+                for (int i = 0; i < total_columns; i++) {
+                    if(i  == total_columns -1){
+                        fw.write(table.get(i).get(k)+"");
+                    }
+                    else {
+                        fw.write(table.get(i).get(k) + " | ");
+                    }
+                }
+                fw.write("\n");
+            }
+            fw.close();
+        }
+        catch(Exception e){
+            System.out.println(e);
         }
     }
 
