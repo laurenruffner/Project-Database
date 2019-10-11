@@ -1,6 +1,7 @@
 package project1;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ class Main{
         List<Credits> creditsList = movie_parser.deserializeCredits("src/Files/credits.json");
 
         Table movies = new Table("movies");
-        movies.enterColumns(0, "M_id","INTEGER");
+        movies.enterColumns(0, "M_ID","INTEGER");
         movies.enterColumns(1,"Title", "VARCHAR");
         movies.enterColumns(2, "Release_Date", "INTEGER");
         movies.enterColumns(3, "Genre1", "VARCHAR");
@@ -98,17 +99,33 @@ class Main{
             //Original Language
             movies.insertData(10, moviesList.get(i).getOriginal_language(), false);
             //Description
-            movies.insertData(11, moviesList.get(i).getOverview(), false);
+
+            String description = moviesList.get(i).getOverview().replace("|", "/");
+            if (description.compareTo("")==0){
+                movies.insertData(11, "NULL", false);
+            }
+            else {
+                movies.insertData(11, description, false);
+            }
 
             for (int l = 0; l < creditsList.get(i).getCastMember().size(); l++){
-                //movie id
-                cast.insertData(0, creditsList.get(i).getId(), true);
-                //ID
-                cast.insertData(1, Integer.toString(creditsList.get(i).getCastMember().get(l).getId()), true);
-                //Name
-                cast.insertData(2, creditsList.get(i).getCastMember().get(l).getName(), false);
-                //Character
-                cast.insertData(3, creditsList.get(i).getCastMember().get(l).getCharacter(), false);
+                String characters = creditsList.get(i).getCastMember().get(l).getCharacter().replace("|", "/");
+                String[] arrofCharacters = characters.split(" / ", -2);
+                for (String charact : arrofCharacters) {
+                    //movie id
+                    cast.insertData(0, creditsList.get(i).getId(), true);
+                    //ID
+                    cast.insertData(1, Integer.toString(creditsList.get(i).getCastMember().get(l).getId()), true);
+                    //Name
+                    cast.insertData(2, creditsList.get(i).getCastMember().get(l).getName(), false);
+                    //Character
+                    if (charact.compareTo("") == 0) {
+                        cast.insertData(3, "NULL", false);
+                    } else {
+                        cast.insertData(3, charact, false);
+                    }
+                }
+
             }
             for (int m=0; m < creditsList.get(i).getCrewMember().size(); m++){
                 //movie id
@@ -128,65 +145,95 @@ class Main{
         movies.table_to_file();
         crew.table_to_file();
 
+
         //GUI INPUTS THAT DO THINGS
         //PUT THE INPUTS HERE
         //DEPENDING ON INPUTS IT CREATES AN INPUT.TXT
 
+        boolean query1 = false;
+        boolean query2 = false;
+        boolean query3 = false;
+        boolean query4 = true;
+        boolean query5 = false;
+
+
+        String Character_Name_Q4 = "Woody (voice)"; //Eventually this will be input from GUI
+
         //QUERY1
+        if(query1){
 
-
+        }
         //QUERY2
+        else if(query2){
 
-
+        }
         //QUERY3
+        else if(query3){
 
-
+        }
         //QUERY4
+        else if(query4){
 
+//            File file = new File("src/Files/input_query4.txt");
+//
+//            String fileContent = "OPEN movies;\n" +
+//                    "OPEN cast;\n" +
+//                    "actors <- select (Character == \"" + Character_Name_Q4 + "\") cast;\n" +
+//                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actors);\n" +
+//                    "movie_actor <- project (Title, Name) actor_and_movies;";
+//
+//            FileWriter fileWriter = new FileWriter("src/Files/input_query4.txt");
+//            fileWriter.write(fileContent);
+//            fileWriter.close();
+//
+//            File query_4_file = new File("src/Files/input_query4.txt");
+//            Scanner scanner = new Scanner(query_4_file);
+//            List<String> lines = new ArrayList<>();
+//            while (scanner.hasNextLine()) {
+//                String line = scanner.nextLine();
+//                if (line.length() != 0) { lines.add(line); }
+//            }
+//            MyRulesBaseListener listener = new MyRulesBaseListener();
+//            for (String line : lines) {
+//                CharStream charStream = CharStreams.fromString(line);
+//                RulesLexer lexer = new RulesLexer(charStream);
+//                CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+//                RulesParser parser = new RulesParser(commonTokenStream);
+//                lexer.removeErrorListeners();
+//                parser.removeErrorListeners();
+//                RulesParser.ProgramContext programContext = parser.program();
+//                ParseTreeWalker walker = new ParseTreeWalker();
+//                walker.walk(listener, programContext);
+//            }
 
+        }
         //QUERY5
+        else if(query5){
 
-
-
+        }
 
 
         //DO THIS CHUNK FOR EVERY QUERY ABOVE
 
-        File file = new File("src/project1/input.txt");
-        Scanner scanner = new Scanner(file);
-        List<String> lines = new ArrayList<>();
-
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            if (line.length() != 0) { lines.add(line); }
-        }
-
-        MyRulesBaseListener listener = new MyRulesBaseListener();
-        for (String line : lines) {
-
-            // CREATE A FOR LOOP TO ITERATE THROUGH EACH STRING OBJECT
-            // WE need to do this
-
-            //This sets us the lexer(tokenizer) and parser
-            CharStream charStream = CharStreams.fromString(line);
-            RulesLexer lexer = new RulesLexer(charStream);
-            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-            RulesParser parser = new RulesParser(commonTokenStream);
-
-            //This disables the lexer and parser warnings
-            lexer.removeErrorListeners();
-            parser.removeErrorListeners();
-
-            //This creates the parse tree listener and  the parse tree walker
-            RulesParser.ProgramContext programContext = parser.program();
-            ParseTreeWalker walker = new ParseTreeWalker();
-
-            //This calls this thing over and over and over
-//            MyRulesBaseListener listener = new MyRulesBaseListener();
-            walker.walk(listener, programContext);
-
-
-        }
+//        File file = new File("src/project1/input.txt");
+//        Scanner scanner = new Scanner(file);
+//        List<String> lines = new ArrayList<>();
+//        while (scanner.hasNextLine()) {
+//            String line = scanner.nextLine();
+//            if (line.length() != 0) { lines.add(line); }
+//        }
+//        MyRulesBaseListener listener = new MyRulesBaseListener();
+//        for (String line : lines) {
+//            CharStream charStream = CharStreams.fromString(line);
+//            RulesLexer lexer = new RulesLexer(charStream);
+//            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+//            RulesParser parser = new RulesParser(commonTokenStream);
+//            lexer.removeErrorListeners();
+//            parser.removeErrorListeners();
+//            RulesParser.ProgramContext programContext = parser.program();
+//            ParseTreeWalker walker = new ParseTreeWalker();
+//            walker.walk(listener, programContext);
+//        }
 
     }
 }

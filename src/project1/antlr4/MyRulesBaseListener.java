@@ -4,6 +4,7 @@ import project1.Dbms;
 import project1.Table;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
@@ -127,75 +128,157 @@ public class MyRulesBaseListener extends RulesBaseListener {
     @Override public void exitOpen_cmd(RulesParser.Open_cmdContext ctx) {
         List<ParseTree> children = ctx.children;
         String table_name = children.get(1).getText();
-        try{
+
+
+        //try{
             //reads in file
-            String filename = "src/Files/" +  table_name  + ".db";
-            BufferedReader in = new BufferedReader(new FileReader(filename));
+            String pathname = "src/Files/" +  table_name  + ".db";
+            System.out.println(pathname);
+
             String str;
             int line_num = 0;
             int table_index = -1;
             int column_count = 0;
             List<String> columns = new ArrayList<>();
             List<String> data = new ArrayList<>();
-            while ((str = in.readLine()) != null) {
-                if (line_num == 0) {
-                    myDbms.createTable(table_name); //creates Table
-                }
-                else if (line_num == 1) { //gets the columns for the Table
-                    table_index = myDbms.indexOfTable(table_name);
-                    String[] arrOfStr = str.split(" \\| ", -2);
-                    for (String a : arrOfStr) {
-                        columns.add(a);
+            int count = 0;
+
+
+            try(Scanner scanner = new Scanner(new File(pathname))) {
+                while ( scanner.hasNextLine() ) {
+                    str = scanner.nextLine();
+                    //System.out.println(str);
+                    count++;
+                    //System.out.println(count);
+                    if (line_num == 0) {
+                        myDbms.createTable(table_name); //creates Table
                     }
-                }
-                else if(line_num == 2){ //gets data for each column
-                    String[] arrOfStr = str.split(" \\| ", -2);
-                    for (String a : arrOfStr) {
-                        data.add(a);
-                    }
-                    for (int i=0; i < data.size(); i++){
-                        try {
-                            Integer.parseInt(data.get(i)); //inserts rows and columns into the Table
-                            myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i),"INTEGER");
-                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
-                            column_count++;
-                        }
-                        catch (NumberFormatException e){
-                            myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i), "VARCHAR");
-                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), false);
-                            column_count++;
+                    else if (line_num == 1) { //gets the columns for the Table
+                        table_index = myDbms.indexOfTable(table_name);
+                        String[] arrOfStr = str.split(" \\| ", -2);
+                        for (String a : arrOfStr) {
+                            columns.add(a);
                         }
                     }
-                    column_count = 0;
-                    data.clear();
-                }
-                else{
-                    String[] arrOfStr = str.split(" \\| ", -2);
-                    for (String a : arrOfStr) {
-                        data.add(a);
-                    }
-                    for (int i=0; i < data.size(); i++){
-                        try {
-                            Integer.parseInt(data.get(i));
-                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
-                            column_count++;
+                    else if(line_num == 2){ //gets data for each column
+                        String[] arrOfStr = str.split(" \\| ", -2);
+                        for (String a : arrOfStr) {
+                            data.add(a);
                         }
-                        catch (NumberFormatException e){
-                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), false);
-                            column_count++;
+                        for (int i=0; i < data.size(); i++){
+                            try {
+                                Integer.parseInt(data.get(i)); //inserts rows and columns into the Table
+                                myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i),"INTEGER");
+                                myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
+                                column_count++;
+                            }
+                            catch (NumberFormatException e){
+                                myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i), "VARCHAR");
+                                myDbms.table_list.get(table_index).insertData(column_count, data.get(i), false);
+                                column_count++;
+                            }
                         }
+                        column_count = 0;
+                        data.clear();
                     }
-                    column_count =0;
-                    data.clear();
+                    else{
+                        String[] arrOfStr = str.split(" \\| ", -2);
+                        for (String a : arrOfStr) {
+                            data.add(a);
+                        }
+                        for (int i=0; i < data.size(); i++){
+                            try {
+                                Integer.parseInt(data.get(i));
+                                myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
+                                column_count++;
+                            }
+                            catch (NumberFormatException e){
+                                myDbms.table_list.get(table_index).insertData(column_count, data.get(i), false);
+                                column_count++;
+                            }
+                        }
+                        column_count =0;
+                        data.clear();
+                    }
+                    line_num++;
+                    // process line here.
                 }
-                line_num++;
             }
-            in.close();
-            myDbms.table_list.get(myDbms.indexOfTable(table_name)).printTable();
-        }
-        catch(Exception e){
-            System.out.println("You suck at typing");
-        }
+            catch(Exception e) {
+                System.out.println("You can't type");
+            }
+
+
+//            BufferedReader in = new BufferedReader(new FileReader(filename));
+//            //System.out.println("Buffered Reader");
+//            String str;
+//            int line_num = 0;
+//            int table_index = -1;
+//            int column_count = 0;
+//            List<String> columns = new ArrayList<>();
+//            List<String> data = new ArrayList<>();
+//            int count = 0;
+//            while ((str = in.readLine()) != null) {
+//                count++;
+//                System.out.println(count);
+//                if (line_num == 0) {
+//                    myDbms.createTable(table_name); //creates Table
+//                }
+//                else if (line_num == 1) { //gets the columns for the Table
+//                    table_index = myDbms.indexOfTable(table_name);
+//                    String[] arrOfStr = str.split(" \\| ", -2);
+//                    for (String a : arrOfStr) {
+//                        columns.add(a);
+//                    }
+//                }
+//                else if(line_num == 2){ //gets data for each column
+//                    String[] arrOfStr = str.split(" \\| ", -2);
+//                    for (String a : arrOfStr) {
+//                        data.add(a);
+//                    }
+//                    for (int i=0; i < data.size(); i++){
+//                        try {
+//                            Integer.parseInt(data.get(i)); //inserts rows and columns into the Table
+//                            myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i),"INTEGER");
+//                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
+//                            column_count++;
+//                        }
+//                        catch (NumberFormatException e){
+//                            myDbms.table_list.get(table_index).enterColumns(column_count,columns.get(i), "VARCHAR");
+//                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), false);
+//                            column_count++;
+//                        }
+//                    }
+//                    column_count = 0;
+//                    data.clear();
+//                }
+//                else{
+//                    String[] arrOfStr = str.split(" \\| ", -2);
+//                    for (String a : arrOfStr) {
+//                        data.add(a);
+//                    }
+//                    for (int i=0; i < data.size(); i++){
+//                        try {
+//                            Integer.parseInt(data.get(i));
+//                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), true);
+//                            column_count++;
+//                        }
+//                        catch (NumberFormatException e){
+//                            myDbms.table_list.get(table_index).insertData(column_count, data.get(i), false);
+//                            column_count++;
+//                        }
+//                    }
+//                    column_count =0;
+//                    data.clear();
+//                }
+//                line_num++;
+//            }
+//            in.close();
+//            myDbms.table_list.get(myDbms.indexOfTable(table_name)).printTable();
+//        }
+//        catch(Exception e){
+//            System.out.println("You suck at typing");
+//        }
     }
 
     //Puts table into a new File
