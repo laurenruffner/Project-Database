@@ -231,12 +231,11 @@ public class Dbms {
 
     // Operation function for "=="
     public void equality(String operand1, String operand2, String table_name){
-
-        System.out.println(table_name);
-        System.out.println(operand1);
-        System.out.println(operand2);
+        //System.out.println(table_name);
+        //System.out.println(operand1);
+        //System.out.println(operand2);
         int index_table = indexOfTable(table_name);
-        System.out.println(index_table);
+        //System.out.println(index_table);
         int index_column = table_list.get(index_table).getColumnNumber(operand1);
         List<Integer> index_list = new ArrayList<>();
         if(table_list.get(index_table).getColumnNumber(operand2) != -1){
@@ -533,13 +532,13 @@ public class Dbms {
                 temp.enterColumns(addColumnIndex,temp2.column_name.get(i), "INTEGER");
             }
         }
-        temp.printTable();
+        //temp.printTable();
 
         int columns1 = temp1.table.size();
         int columns2 = temp2.table.size();
         int rows1 = temp1.table.get(0).size();
         int rows2 = temp2.table.get(0).size();
-        System.out.println(rows1*rows2);
+        //System.out.println(rows1*rows2);
         for(int m = 0; m < rows2; m++) {
             for (int i = 0; i < rows1; i++) {
                 List<Object> row_of_temp1 = new ArrayList<>();

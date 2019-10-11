@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.util.*;
 
 public class MyRulesBaseListener extends RulesBaseListener {
-    Dbms myDbms;
+    public Dbms myDbms;
     int count_inserts = 0;
     List<String> ConditionList;
     Stack<String> OperatorStack;
@@ -133,7 +133,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
         //try{
             //reads in file
             String pathname = "src/Files/" +  table_name  + ".db";
-            System.out.println(pathname);
+            //System.out.println(pathname);
 
             String str;
             int line_num = 0;

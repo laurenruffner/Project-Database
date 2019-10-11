@@ -118,36 +118,38 @@ class Main{
             for (int l = 0; l < creditsList.get(i).getCastMember().size(); l++){
                 String characters = creditsList.get(i).getCastMember().get(l).getCharacter().replace("|", "/");
                 String[] arrofCharacters = characters.split(" / ", -2);
-                for (String charact : arrofCharacters) {
+                for (String string_string : arrofCharacters) {
                     //movie id
-                    cast.insertData(0, creditsList.get(i).getId(), true);
+                    String[] arrofCharacters2 = string_string.split("/", -2);
+                    for (String charact : arrofCharacters2){
+                        cast.insertData(0, creditsList.get(i).getId(), true);
 
-                    //ID
-                    cast.insertData(1, Integer.toString(creditsList.get(i).getCastMember().get(l).getId()), true);
+                        //ID
+                        cast.insertData(1, Integer.toString(creditsList.get(i).getCastMember().get(l).getId()), true);
 
-                    //Name
-                    String name = Normalizer.normalize(creditsList.get(i).getCastMember().get(l).getName(), Normalizer.Form.NFD);
-                    name = name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
-                            .replace(" ", "_").replace(".", "").replace("'", "");
-                    cast.insertData(2, name, false);
-
-                    //Character
-                    if (charact.compareTo("") == 0) {
-                        cast.insertData(3, "NULL", false);
-                    } else {
-                        //Remove after Comma
-                        if (charact.contains(", Jr")){
-                            charact = charact.replace(",", "");
-                        }
-                        else {
-                            charact = charact.split(",")[0].split(" \\(")[0];
-                        }
-
-                        charact = Normalizer.normalize(charact, Normalizer.Form.NFD);
-                        charact = charact.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
+                        //Name
+                        String name = Normalizer.normalize(creditsList.get(i).getCastMember().get(l).getName(), Normalizer.Form.NFD);
+                        name = name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
                                 .replace(" ", "_").replace(".", "").replace("'", "");
+                        cast.insertData(2, name, false);
 
-                        cast.insertData(3, charact, false);
+                        //Character
+                        if (charact.compareTo("") == 0) {
+                            cast.insertData(3, "NULL", false);
+                        } else {
+                            //Remove after Comma
+                            if (charact.contains(", Jr")) {
+                                charact = charact.replace(",", "");
+                            } else {
+                                charact = charact.split(",")[0].split(" \\(")[0];
+                            }
+
+                            charact = Normalizer.normalize(charact, Normalizer.Form.NFD);
+                            charact = charact.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                                    .replace(" ", "_").replace(".", "").replace("'", "");
+
+                            cast.insertData(3, charact, false);
+                        }
                     }
                 }
             }
@@ -157,11 +159,21 @@ class Main{
                 //ID
                 crew.insertData(1, Integer.toString(creditsList.get(i).getCrewMember().get(m).getId()), true);
                 //Name
-                crew.insertData(2, creditsList.get(i).getCrewMember().get(m).getName(), false);
+                String crew_name = Normalizer.normalize(creditsList.get(i).getCrewMember().get(m).getName(), Normalizer.Form.NFD);
+                crew_name = crew_name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
+                        .replace(" ", "_").replace(".", "").replace("'", "");
+                crew.insertData(2, crew_name, false);
                 //Department
-                crew.insertData(3, creditsList.get(i).getCrewMember().get(m).getDepartment(), false);
+                String depart_name = Normalizer.normalize(creditsList.get(i).getCrewMember().get(m).getDepartment(), Normalizer.Form.NFD);
+                depart_name = depart_name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
+                        .replace("-", "_").replace(" ", "_").replace(".", "").replace("'", "").replace("&", "and");
+                crew.insertData(3, depart_name, false);
                 //Job
-                crew.insertData(4, creditsList.get(i).getCrewMember().get(m).getJob(), false);
+                String job = Normalizer.normalize(creditsList.get(i).getCrewMember().get(m).getJob(), Normalizer.Form.NFD);
+                job = job.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
+                        .replace(" ", "_").replace(".", "").replace("'", "").replace("&", "and")
+                        .replace("#", "").replace("-", "_");
+                crew.insertData(4, job, false);
             }
         }
 
@@ -177,17 +189,12 @@ class Main{
 
 
 
-
-
-
-
-
         boolean query3 = false;
         boolean query4 = false;
         boolean query5 = false;
 
 
-        String Character_Name_Q4 = "Harry_Potter"; //Eventually this will be input from GUI
+        String Character_Name_Q4 = "Harry Potter"; //Eventually this will be input from GUI
 
 
         if(query3){
@@ -196,15 +203,16 @@ class Main{
         //QUERY4
         else if(query4){
 
-            String character_name = Character_Name_Q4.replace(" ", "_");
+            String character_name = Character_Name_Q4.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                    .replace(" ", "_").replace(".", "").replace("'", "");
+
             File file = new File("src/Files/input_query4.txt");
 
             String fileContent = "OPEN movies;\n" +
                     "OPEN cast;\n" +
                     "actors <- select (Character == \"" + character_name + "\") cast;\n" +
                     "actor_and_movies <- select (M_ID == Movie_ID) (movies * actors);\n" +
-                    "movie_actor <- project (Title, Name) actor_and_movies;" +
-                    "SHOW movie_actor;";
+                    "movie_actor <- project (Title, Name) actor_and_movies;";
 
             FileWriter fileWriter = new FileWriter("src/Files/input_query4.txt");
             fileWriter.write(fileContent);
@@ -229,6 +237,9 @@ class Main{
                 ParseTreeWalker walker = new ParseTreeWalker();
                 walker.walk(listener, programContext);
             }
+
+            Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("movie_actor"));
+            output.printTable();
 
         }
         //QUERY5
