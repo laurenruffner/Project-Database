@@ -195,7 +195,7 @@ class Main{
 
 
         String Character_Name_Q4 = "Harry Potter"; //Eventually this will be input from GUI
-
+        String Actor_Name_Q5 = "Tom Hanks";
 
         if(query3){
 
@@ -244,7 +244,110 @@ class Main{
         }
         //QUERY5
         else if(query5){
+            String actor_name = Actor_Name_Q5.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                    .replace(" ", "_").replace(".", "").replace("'", "");
 
+            File file = new File("src/Files/input_query5.txt");
+            String fileContent = "OPEN movies;\n" +
+                    "OPEN cast;\n" +
+                    "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
+                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
+                    "actors_movies <- project (Title, M_ID, Rating) actor_and_movies;"; //table of movies for actor
+
+            FileWriter fileWriter = new FileWriter("src/Files/input_query5.txt");
+            fileWriter.write(fileContent);
+            fileWriter.close();
+
+            File query_five_file = new File("src/Files/input_query5.txt");
+            Scanner scanner = new Scanner(query_five_file);
+            List<String> lines = new ArrayList<>();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() != 0) { lines.add(line); }
+            }
+            MyRulesBaseListener listener = new MyRulesBaseListener();
+            for (String line : lines) {
+                CharStream charStream = CharStreams.fromString(line);
+                RulesLexer lexer = new RulesLexer(charStream);
+                CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+                RulesParser parser = new RulesParser(commonTokenStream);
+                lexer.removeErrorListeners();
+                parser.removeErrorListeners();
+                RulesParser.ProgramContext programContext = parser.program();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(listener, programContext);
+             }
+            // System.out.println(listener.myDbms.indexOfTable("a"));
+            Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_movies"));
+            //output.printTable();
+
+            int highestRatedMovieID = (int)output.table.get(1).get(0);
+            String highestRatedMovieName = (String)output.table.get(0).get(0);
+            //finds the highest rated movie in the actorMovie table
+            //IF TWO MOVIES ARE THE HIGHEST RATED, THE LAST ONE IN THE TABLE IS USED
+            for(int i = 0; i < output.table.get(0).size() - 1; i++) {
+                if ((int)output.table.get(2).get(i + 1) > (int)output.table.get(2).get(i)) {
+                    highestRatedMovieID = (int)output.table.get(1).get(i + 1);
+                    highestRatedMovieName = (String)output.table.get(0).get(i + 1);
+                }
+            }
+
+            // System.out.println("Highest Rated Movie ID: " + highestRatedMovieID);
+
+            //gets id of director
+            int directorID = -1;
+            for(int i = 0; i < crew.table.get(0).size(); i++) {
+                String job = (String)crew.table.get(4).get(i);
+                if(((int)crew.table.get(0).get(i) == (int)highestRatedMovieID) && (job.compareTo("Director") == 0)) {
+                    directorID = (int)crew.table.get(1).get(i);
+                }
+            }
+
+            // System.out.println("Director of Highest Rated Movie: " + directorID);
+
+            Table director = new Table("director");
+            director.enterColumns(0, "Movie_ID","INTEGER");
+            director.enterColumns(1,"ID", "INTEGER");
+            director.enterColumns(2, "Job", "VARCHAR");
+            director.enterColumns(3, "Name", "VARCHAR");
+
+            //gets table of all instances of director
+            for(int i = 0; i < crew.table.get(0).size(); i++) {
+                int crewID = (int)crew.table.get(1).get(i);
+                String job = (String)crew.table.get(4).get(i);
+                if(crewID == directorID && (job.compareTo("Director") == 0)) {
+                    director.insertData(0, Integer.toString((int)crew.table.get(0).get(i)), true);
+                    director.insertData(1, Integer.toString((int)crew.table.get(1).get(i)), true);
+                    director.insertData(2, (String)crew.table.get(4).get(i), false);
+                    director.insertData(3, (String)crew.table.get(2).get(i), false);
+                }
+            }
+
+            //gets table of movies for each instance of director
+            Table directorMovies = new Table("directorMovies");
+            directorMovies.enterColumns(0, "M_ID","INTEGER");
+            directorMovies.enterColumns(1,"Title", "VARCHAR");
+            directorMovies.enterColumns(2, "Rating", "INTEGER");
+
+            for(int j = 0; j < movies.table.get(0).size(); j++) {
+                for (int i = 0; i < director.table.get(0).size(); i++) {
+                    if ((int) movies.table.get(0).get(j) == (int) director.table.get(0).get(i)) {
+                        directorMovies.insertData(0, Integer.toString((int) movies.table.get(0).get(i)), true);
+                        directorMovies.insertData(1, (String) movies.table.get(1).get(i), false);
+                        directorMovies.insertData(2, Integer.toString((int) movies.table.get(7).get(i)), true);
+                    }
+                }
+            }
+
+            //finds worst ranked movie
+            String worstRankedMovie = (String)directorMovies.table.get(1).get(0);
+            for(int i = 0; i < directorMovies.table.get(0).size() - 1; i++) {
+                if ((int)directorMovies.table.get(2).get(i + 1) < (int)directorMovies.table.get(2).get(i)) {
+                    worstRankedMovie = (String)directorMovies.table.get(1).get(i +1);
+                }
+            }
+            System.out.println(Actor_Name_Q5 + "'s highest rated movie is " + highestRatedMovieName + ", directed by " + (String)director.table.get(3).get(0) + ".");
+            System.out.println("The worst ranked movie directed by " + (String)director.table.get(3).get(0) + " is " + worstRankedMovie +".");
         }
 
 
