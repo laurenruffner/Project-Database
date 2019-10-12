@@ -170,22 +170,23 @@ public class GUIController implements Initializable{
         //System.out.println("test");
         Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_movies"));
         //output.printTable();
+        Table crew = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("crew"));
+        Table movies = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("movies"));
 
         int highestRatedMovieID = (int)output.table.get(1).get(0);
+        int highest_rank = (int) output.table.get(2).get(0);
         String highestRatedMovieName = (String)output.table.get(0).get(0);
         //finds the highest rated movie in the actorMovie table
         //IF TWO MOVIES ARE THE HIGHEST RATED, THE LAST ONE IN THE TABLE IS USED
         for(int i = 0; i < output.table.get(0).size() - 1; i++) {
-            if ((int)output.table.get(2).get(i + 1) > (int)output.table.get(2).get(i)) {
+            if ((int)output.table.get(2).get(i + 1) > highest_rank) {
                 highestRatedMovieID = (int)output.table.get(1).get(i + 1);
                 highestRatedMovieName = (String)output.table.get(0).get(i + 1);
+                highest_rank = (int)output.table.get(2).get(i + 1);
             }
         }
 
-        //System.out.println("Highest Rated Movie ID: " + highestRatedMovieID);
-
-        Table crew = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("crew"));
-        Table movies = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("movies"));
+        // System.out.println("Highest Rated Movie ID: " + highestRatedMovieID);
 
         //gets id of director
         int directorID = -1;
@@ -236,10 +237,12 @@ public class GUIController implements Initializable{
         //directorMovies.printTable();
 
         //finds worst ranked movie
+        int worst_rank = (int)directorMovies.table.get(2).get(0);
         String worstRankedMovie = (String)directorMovies.table.get(1).get(0);
         for(int i = 0; i < directorMovies.table.get(0).size() - 1; i++) {
-            if ((int)directorMovies.table.get(2).get(i + 1) < (int)directorMovies.table.get(2).get(i)) {
-                worstRankedMovie = (String)directorMovies.table.get(1).get(i + 1);
+            if ((int)directorMovies.table.get(2).get(i + 1) < worst_rank) {
+                worstRankedMovie = (String)directorMovies.table.get(1).get(i +1);
+                worst_rank = (int)directorMovies.table.get(2).get(i + 1);
             }
         }
         //directorMovies.printTable();

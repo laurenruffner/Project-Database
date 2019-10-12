@@ -24,14 +24,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application{
-
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
         primaryStage.setTitle("Movie Database GUI");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-    }
+        }
+
 
     public static void main(String[] args) throws IOException {
         MovieDatabaseParser movie_parser = new MovieDatabaseParser();
@@ -72,6 +72,28 @@ public class Main extends Application{
 
             String string = Normalizer.normalize(moviesList.get(i).getTitle(), Normalizer.Form.NFD);
             String title = string.replaceAll("[^\\p{ASCII}]", "");
+
+            try {
+                Integer.parseInt(title);
+                title = title + "_";
+                title = title.replace("\"", "")
+                        .replace(",", "").replace("#","").replace("&", "and")
+                        .replace(":", "").replace(" (voice)" , "").replace(" (uncredited)", "")
+                        .replace("'", "").replace("!", "").replace(".", "")
+                        .replace("%", " percent").replace("·","").replace(" -","")
+                        .replace("-","").replace("?", "").replaceAll(" '\\.\\*'","")
+                        .replace(" ", "_").replace("@", "at");
+
+            } catch(NumberFormatException e){
+                title = title.replace("\"", "")
+                        .replace(",", "").replace("#","").replace("&", "and")
+                        .replace(":", "").replace(" (voice)" , "").replace(" (uncredited)", "")
+                        .replace("'", "").replace("!", "").replace(".", "")
+                        .replace("%", " percent").replace("·","").replace(" -","")
+                        .replace("-","").replace("?", "").replaceAll(" '\\.\\*'","")
+                        .replace(" ", "_").replace("@", "at");
+
+            }
 
              title = title.replace("\"", "")
                     .replace(",", "").replace("#","").replace("&", "and")
@@ -162,7 +184,7 @@ public class Main extends Application{
                             charact = Normalizer.normalize(charact, Normalizer.Form.NFD);
                             charact = charact.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
                                     .replace(" ", "_").replace(".", "").replace("'", "")
-                                    .replace("-", "_");
+                                    .replace("-", "_").replace("#", "");
 
                             cast.insertData(3, charact, false);
                         }
@@ -201,6 +223,7 @@ public class Main extends Application{
         //GUI INPUTS THAT DO THINGS
         //PUT THE INPUTS HERE
         //DEPENDING ON INPUTS IT CREATES AN INPUT.TXT
+
         launch(args);
 
 
@@ -211,7 +234,7 @@ public class Main extends Application{
 
 
         String Character_Name_Q4 = "Child"; //Eventually this will be input from GUI
-        String Actor_Name_Q5 = "Tom Hanks";
+        String Actor_Name_Q5 = "Kevin Bacon";
 
 
 
@@ -229,6 +252,7 @@ public class Main extends Application{
 
             String fileContent = "OPEN movies;\n" +
                     "OPEN cast;\n" +
+                    "OPEN crew;\n" +
                     "actors <- select (Character == \"" + character_name + "\") cast;\n" +
                     "actor_and_movies <- select (M_ID == Movie_ID) (movies * actors);\n" +
                     "movie_actor <- project (Title, Name) actor_and_movies;";
@@ -270,8 +294,9 @@ public class Main extends Application{
             String fileContent = "OPEN movies;\n" +
                     "OPEN cast;\n" +
                     "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
-                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
-                    "actors_movies <- project (Title, M_ID, Rating) actor_and_movies;"; //table of movies for actor
+                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor);\n" +//table where ids are the same
+                    "actors_movies <- project (Title, M_ID, Rating) actor_and_movies;"+
+                    "SHOW actors_movies"; //table of movies for actor
 
             FileWriter fileWriter = new FileWriter("src/Files/input_query5.txt");
             fileWriter.write(fileContent);
@@ -301,13 +326,15 @@ public class Main extends Application{
             //output.printTable();
 
             int highestRatedMovieID = (int)output.table.get(1).get(0);
+            int highest_rank = (int) output.table.get(2).get(0);
             String highestRatedMovieName = (String)output.table.get(0).get(0);
             //finds the highest rated movie in the actorMovie table
             //IF TWO MOVIES ARE THE HIGHEST RATED, THE LAST ONE IN THE TABLE IS USED
             for(int i = 0; i < output.table.get(0).size() - 1; i++) {
-                if ((int)output.table.get(2).get(i + 1) > (int)output.table.get(2).get(i)) {
+                if ((int)output.table.get(2).get(i + 1) > highest_rank) {
                     highestRatedMovieID = (int)output.table.get(1).get(i + 1);
                     highestRatedMovieName = (String)output.table.get(0).get(i + 1);
+                    highest_rank = (int)output.table.get(2).get(i + 1);
                 }
             }
 
@@ -341,7 +368,7 @@ public class Main extends Application{
                     director.insertData(3, (String)crew.table.get(2).get(i), false);
                 }
             }
-            //director.printTable();
+            director.printTable();
 
             //gets table of movies for each instance of director
             Table directorMovies = new Table("directorMovies");
@@ -359,13 +386,15 @@ public class Main extends Application{
                 }
             }
 
-            //directorMovies.printTable();
+            directorMovies.printTable();
 
             //finds worst ranked movie
+            int worst_rank = (int)directorMovies.table.get(2).get(0);
             String worstRankedMovie = (String)directorMovies.table.get(1).get(0);
             for(int i = 0; i < directorMovies.table.get(0).size() - 1; i++) {
-                if ((int)directorMovies.table.get(2).get(i + 1) < (int)directorMovies.table.get(2).get(i)) {
+                if ((int)directorMovies.table.get(2).get(i + 1) < worst_rank) {
                     worstRankedMovie = (String)directorMovies.table.get(1).get(i +1);
+                    worst_rank = (int)directorMovies.table.get(2).get(i + 1);
                 }
             }
             //directorMovies.printTable();
