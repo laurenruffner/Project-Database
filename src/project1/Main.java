@@ -130,7 +130,7 @@ class Main{
                         //Name
                         String name = Normalizer.normalize(creditsList.get(i).getCastMember().get(l).getName(), Normalizer.Form.NFD);
                         name = name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
-                                .replace(" ", "_").replace(".", "").replace("'", "");
+                                .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
                         cast.insertData(2, name, false);
 
                         //Character
@@ -146,7 +146,8 @@ class Main{
 
                             charact = Normalizer.normalize(charact, Normalizer.Form.NFD);
                             charact = charact.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
-                                    .replace(" ", "_").replace(".", "").replace("'", "");
+                                    .replace(" ", "_").replace(".", "").replace("'", "")
+                                    .replace("-", "_");
 
                             cast.insertData(3, charact, false);
                         }
@@ -161,7 +162,7 @@ class Main{
                 //Name
                 String crew_name = Normalizer.normalize(creditsList.get(i).getCrewMember().get(m).getName(), Normalizer.Form.NFD);
                 crew_name = crew_name.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'","")
-                        .replace(" ", "_").replace(".", "").replace("'", "");
+                        .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
                 crew.insertData(2, crew_name, false);
                 //Department
                 String depart_name = Normalizer.normalize(creditsList.get(i).getCrewMember().get(m).getDepartment(), Normalizer.Form.NFD);
@@ -191,10 +192,10 @@ class Main{
 
         boolean query3 = false;
         boolean query4 = false;
-        boolean query5 = false;
+        boolean query5 = true;
 
 
-        String Character_Name_Q4 = "Harry Potter"; //Eventually this will be input from GUI
+        String Character_Name_Q4 = "Child"; //Eventually this will be input from GUI
         String Actor_Name_Q5 = "Tom Hanks";
 
         if(query3){
@@ -204,7 +205,8 @@ class Main{
         else if(query4){
 
             String character_name = Character_Name_Q4.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
-                    .replace(" ", "_").replace(".", "").replace("'", "");
+                    .replace(" ", "_").replace(".", "").replace("'", "")
+                    .replace("-", "_");
 
             File file = new File("src/Files/input_query4.txt");
 
@@ -245,7 +247,7 @@ class Main{
         //QUERY5
         else if(query5){
             String actor_name = Actor_Name_Q5.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
-                    .replace(" ", "_").replace(".", "").replace("'", "");
+                    .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
 
             File file = new File("src/Files/input_query5.txt");
             String fileContent = "OPEN movies;\n" +
@@ -303,7 +305,7 @@ class Main{
                 }
             }
 
-            // System.out.println("Director of Highest Rated Movie: " + directorID);
+            //System.out.println("Director of Highest Rated Movie: " + directorID);
 
             Table director = new Table("director");
             director.enterColumns(0, "Movie_ID","INTEGER");
@@ -322,6 +324,7 @@ class Main{
                     director.insertData(3, (String)crew.table.get(2).get(i), false);
                 }
             }
+            //director.printTable();
 
             //gets table of movies for each instance of director
             Table directorMovies = new Table("directorMovies");
@@ -332,12 +335,14 @@ class Main{
             for(int j = 0; j < movies.table.get(0).size(); j++) {
                 for (int i = 0; i < director.table.get(0).size(); i++) {
                     if ((int) movies.table.get(0).get(j) == (int) director.table.get(0).get(i)) {
-                        directorMovies.insertData(0, Integer.toString((int) movies.table.get(0).get(i)), true);
-                        directorMovies.insertData(1, (String) movies.table.get(1).get(i), false);
-                        directorMovies.insertData(2, Integer.toString((int) movies.table.get(7).get(i)), true);
+                        directorMovies.insertData(0, Integer.toString((int) movies.table.get(0).get(j)), true);
+                        directorMovies.insertData(1, (String) movies.table.get(1).get(j), false);
+                        directorMovies.insertData(2, Integer.toString((int) movies.table.get(7).get(j)), true);
                     }
                 }
             }
+
+            //directorMovies.printTable();
 
             //finds worst ranked movie
             String worstRankedMovie = (String)directorMovies.table.get(1).get(0);
@@ -346,6 +351,7 @@ class Main{
                     worstRankedMovie = (String)directorMovies.table.get(1).get(i +1);
                 }
             }
+            //directorMovies.printTable();
             System.out.println(Actor_Name_Q5 + "'s highest rated movie is " + highestRatedMovieName + ", directed by " + (String)director.table.get(3).get(0) + ".");
             System.out.println("The worst ranked movie directed by " + (String)director.table.get(3).get(0) + " is " + worstRankedMovie +".");
         }
