@@ -207,11 +207,13 @@ public class Main extends Application{
 
         boolean query3 = false;
         boolean query4 = false;
-        boolean query5 = true;
+        boolean query5 = false;
 
 
         String Character_Name_Q4 = "Child"; //Eventually this will be input from GUI
         String Actor_Name_Q5 = "Tom Hanks";
+
+
 
         if(query3){
 

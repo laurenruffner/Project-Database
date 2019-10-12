@@ -411,7 +411,6 @@ public class Table {
         return table.get(0).size();
     }
 
-
     //Moving the take to a file
     public void table_to_file(){
         try {
