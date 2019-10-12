@@ -17,7 +17,22 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-class Main{
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class Main extends Application{
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        Parent root = FXMLLoader.load(getClass().getResource("GUI.fxml"));
+        primaryStage.setTitle("Movie Database GUI");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
+    }
+
     public static void main(String[] args) throws IOException {
         MovieDatabaseParser movie_parser = new MovieDatabaseParser();
 
@@ -186,7 +201,7 @@ class Main{
         //GUI INPUTS THAT DO THINGS
         //PUT THE INPUTS HERE
         //DEPENDING ON INPUTS IT CREATES AN INPUT.TXT
-
+        launch(args);
 
 
 

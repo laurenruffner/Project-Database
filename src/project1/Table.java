@@ -1,8 +1,5 @@
 package project1;
 
-
-
-import javax.json.*;
 import java.io.FileWriter;
 import java.util.*;
 
@@ -406,6 +403,15 @@ public class Table {
         }
     }
 
+    public String getData(int a, int b){
+        return table.get(a).get(b).toString();
+    }
+
+    public int getNumberofRows() {
+        return table.get(0).size();
+    }
+
+
     //Moving the take to a file
     public void table_to_file(){
         try {
@@ -439,5 +445,4 @@ public class Table {
             System.out.println(e);
         }
     }
-
 }
