@@ -317,7 +317,6 @@ public class Main extends Application{
             System.out.println(Actor_Name_Q3 + "'s appears most in movies of genre: " + genre);
             //System.out.println("Amount: " + maxGenre);
         }
-
         //QUERY4
         else if(query4){
 

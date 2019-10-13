@@ -29,6 +29,8 @@ public class GUIController implements Initializable{
     @FXML
     private TextField actorG;
     @FXML
+    private Text actor_name;
+    @FXML
     private Text genre;
     //query4
     @FXML
@@ -55,13 +57,104 @@ public class GUIController implements Initializable{
     @FXML
     private Text worstMovie;
 
+
+    private String query3(String actorName) throws Exception{
+        String actor_name = actorName.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
+
+        File file = new File("src/Files/input_query3.txt");
+
+        String fileContent = "OPEN movies;\n" +
+                "OPEN cast;\n" +
+                "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
+                "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
+                "actors_genres <- project (Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
+
+        FileWriter fileWriter = new FileWriter("src/Files/input_query3.txt");
+        fileWriter.write(fileContent);
+        fileWriter.close();
+
+        File query_five_file = new File("src/Files/input_query3.txt");
+        Scanner scanner = new Scanner(query_five_file);
+        List<String> lines = new ArrayList<>();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if (line.length() != 0) { lines.add(line); }
+        }
+        MyRulesBaseListener listener = new MyRulesBaseListener();
+        for (String line : lines) {
+            CharStream charStream = CharStreams.fromString(line);
+            RulesLexer lexer = new RulesLexer(charStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            RulesParser parser = new RulesParser(commonTokenStream);
+            lexer.removeErrorListeners();
+            parser.removeErrorListeners();
+            RulesParser.ProgramContext programContext = parser.program();
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(listener, programContext);
+        }
+
+        Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_genres"));
+        ArrayList<String> genres = new ArrayList<String>();
+        ArrayList<Integer> gCount = new ArrayList<Integer>();
+        int nullamt = 0;
+        //output.printTable();
+        // nested for loops to look at each genre in the table
+        for(int j = 0; j < 3; j++) {
+            for (int i = 0; i < output.table.get(j).size(); i++) {
+                String genre = (String)output.table.get(j).get(i);
+                int x = genres.indexOf(genre);
+                // if genre is NULL do nothing
+                if(genre.compareTo("NULL") == 0) {
+                    nullamt++;
+                }
+                // if genre is in the list we increase the amount by 1
+                else if(x != -1){
+                    int inc = gCount.get(x) + 1;
+                    gCount.set(x, inc);
+                }
+                // if genre is not already in the list of genres
+                else{
+                    genres.add(genre);
+                    gCount.add(1);
+                }
+            }
+        }
+        // sets first genre to max
+        int maxGenre = gCount.get(0);
+        int maxInd = 0;
+        // Finds max in amount list
+        int k;
+        for(k = 0; k < gCount.size(); k++){
+            if(maxGenre < gCount.get(k)){
+                maxInd = k;
+                maxGenre = gCount.get(k);
+            }
+        }
+        // Gets genre name from max in amount list
+        String genre = genres.get(maxInd);
+        //System.out.println("Null amt: " + nullamt);
+        //System.out.println(Actor_Name_Q3 + "'s appears most in movies of genre: " + genre);
+        //System.out.println("Amount: " + maxGenre);
+        return genre;
+    }
+
     //query3
     @FXML
     private void mostCommonGenre(){
         String actor = actorG.getText();
         actorG.clear();
 
-        genre.setText(actor);
+        String mostCommonGenre = "";
+        try {
+            mostCommonGenre = query3(actor);
+            mostCommonGenre = mostCommonGenre.replace("_"," "); //add spaces back in
+            actor_name.setText(actor + "'s");
+            genre.setText(mostCommonGenre.toLowerCase() + ".");
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
     }
 
     public Table query4(String character) throws Exception{
@@ -154,7 +247,6 @@ public class GUIController implements Initializable{
             if (line.length() != 0) { lines.add(line); }
         }
         MyRulesBaseListener listener = new MyRulesBaseListener();
-        //System.out.println("test2");
         for (String line : lines) {
             CharStream charStream = CharStreams.fromString(line);
             RulesLexer lexer = new RulesLexer(charStream);
@@ -167,7 +259,6 @@ public class GUIController implements Initializable{
             walker.walk(listener, programContext);
         }
 
-        //System.out.println("test");
         Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_movies"));
         //output.printTable();
         Table crew = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("crew"));
@@ -276,14 +367,14 @@ public class GUIController implements Initializable{
             best = best.replace("_"," "); //add spaces back in
             worst = q5.get(2);
             worst = worst.replace("_"," "); //add spaces back in
+            bestMovie.setText(best);
+            director.setText(direct + ".");
+            director2.setText(direct);
+            worstMovie.setText(worst + ".");
         }
         catch(Exception e){
             System.out.println(e);
         }
-        bestMovie.setText(best);
-        director.setText(direct + ".");
-        director2.setText(direct);
-        worstMovie.setText(worst + ".");
     }
 
 
