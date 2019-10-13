@@ -232,15 +232,92 @@ public class Main extends Application{
         boolean query4 = false;
         boolean query5 = false;
 
-
+        String Actor_Name_Q3 = "Tom Hanks";
         String Character_Name_Q4 = "Child"; //Eventually this will be input from GUI
         String Actor_Name_Q5 = "Kevin Bacon";
 
 
-
+        // QUERY3
         if(query3){
+            String actor_name = Actor_Name_Q3.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                    .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
 
+            File file = new File("src/Files/input_query3.txt");
+
+            String fileContent = "OPEN movies;\n" +
+                    "OPEN cast;\n" +
+                    "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
+                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
+                    "actors_genres <- project (Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
+
+            FileWriter fileWriter = new FileWriter("src/Files/input_query3.txt");
+            fileWriter.write(fileContent);
+            fileWriter.close();
+
+            File query_five_file = new File("src/Files/input_query3.txt");
+            Scanner scanner = new Scanner(query_five_file);
+            List<String> lines = new ArrayList<>();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() != 0) { lines.add(line); }
+            }
+            MyRulesBaseListener listener = new MyRulesBaseListener();
+            for (String line : lines) {
+                CharStream charStream = CharStreams.fromString(line);
+                RulesLexer lexer = new RulesLexer(charStream);
+                CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+                RulesParser parser = new RulesParser(commonTokenStream);
+                lexer.removeErrorListeners();
+                parser.removeErrorListeners();
+                RulesParser.ProgramContext programContext = parser.program();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(listener, programContext);
+            }
+
+            Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_genres"));
+            ArrayList<String> genres = new ArrayList<String>();
+            ArrayList<Integer> gCount = new ArrayList<Integer>();
+            int nullamt = 0;
+            //output.printTable();
+            // nested for loops to look at each genre in the table
+            for(int j = 0; j < 3; j++) {
+                for (int i = 0; i < output.table.get(j).size(); i++) {
+                    String genre = (String)output.table.get(j).get(i);
+                    int x = genres.indexOf(genre);
+                    // if genre is NULL do nothing
+                    if(genre.compareTo("NULL") == 0) {
+                        nullamt++;
+                    }
+                    // if genre is in the list we increase the amount by 1
+                    else if(x != -1){
+                        int inc = gCount.get(x) + 1;
+                        gCount.set(x, inc);
+                    }
+                    // if genre is not already in the list of genres
+                    else{
+                        genres.add(genre);
+                        gCount.add(1);
+                    }
+                }
+            }
+            // sets first genre to max
+            int maxGenre = gCount.get(0);
+            int maxInd = 0;
+            // Finds max in amount list
+            int k;
+            for(k = 0; k < gCount.size(); k++){
+                if(maxGenre < gCount.get(k)){
+                    maxInd = k;
+                    maxGenre = gCount.get(k);
+                }
+            }
+            // Gets genre name from max in amount list
+            String genre = genres.get(maxInd);
+            //System.out.println("Null amt: " + nullamt);
+            System.out.println(Actor_Name_Q3 + "'s appears most in movies of genre: " + genre);
+            //System.out.println("Amount: " + maxGenre);
         }
+
         //QUERY4
         else if(query4){
 

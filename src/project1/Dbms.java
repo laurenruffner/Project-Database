@@ -548,7 +548,6 @@ public class Dbms {
                 for (int j = 0; j < columns1; j++) {
                     row_of_temp1.add(temp1.table.get(j).get(i));
                 }
-
                 for (int l = 0; l < columns2; l++) {
                     row_of_temp1.add(temp2.table.get(l).get(m));
                 }
