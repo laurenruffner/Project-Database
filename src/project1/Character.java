@@ -3,6 +3,7 @@ package project1;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+//class used in query4 to output both an actor name and a movie they were in into a table
 public class Character {
     private final SimpleStringProperty name;
     private final SimpleStringProperty movie;

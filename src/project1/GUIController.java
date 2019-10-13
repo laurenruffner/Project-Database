@@ -123,7 +123,7 @@ public class GUIController implements Initializable{
         // sets first genre to max
         int maxGenre = gCount.get(0);
         int maxInd = 0;
-        // Finds max in amount list
+        // finds max in amount list
         int k;
         for(k = 0; k < gCount.size(); k++){
             if(maxGenre < gCount.get(k)){
@@ -131,7 +131,7 @@ public class GUIController implements Initializable{
                 maxGenre = gCount.get(k);
             }
         }
-        // Gets genre name from max in amount list
+        // gets genre name from max in amount list
         String genre = genres.get(maxInd);
         //System.out.println("Null amt: " + nullamt);
         //System.out.println(Actor_Name_Q3 + "'s appears most in movies of genre: " + genre);
@@ -142,12 +142,12 @@ public class GUIController implements Initializable{
     //query3
     @FXML
     private void mostCommonGenre(){
-        String actor = actorG.getText();
+        String actor = actorG.getText(); //stores user input
         actorG.clear();
 
         String mostCommonGenre = "";
         try {
-            mostCommonGenre = query3(actor);
+            mostCommonGenre = query3(actor); //uses user input in query3 function to get most common genre
             mostCommonGenre = mostCommonGenre.replace("_"," "); //add spaces back in
             actor_name.setText(actor + "'s");
             genre.setText(mostCommonGenre.toLowerCase() + ".");
@@ -193,14 +193,13 @@ public class GUIController implements Initializable{
             walker.walk(listener, programContext);
         }
 
-        Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("movie_actor"));
+        Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("movie_actor")); //entries of table have movie and an actor in that movie
         return output;
     }
 
     //query4
     @FXML
     private void fillCharTable(){
-        charName.setText(charNameR.getText());
         String character = charNameR.getText(); //stores user input
         charNameR.clear();
         tableView.getItems().clear(); //clears table
@@ -214,9 +213,10 @@ public class GUIController implements Initializable{
                 _name = _name.replace("_"," "); //add spaces back in
                 _movie = output.getData(0,i);
                 _movie = _movie.replace("_"," "); //add spaces back in
-                tableView.getItems().add(new Character(_name,_movie)); //add to GUI table
+                tableView.getItems().add(new Character(_name,_movie)); //add entry to GUI table
             }
-            tableView.sort();
+            charName.setText(character);
+            tableView.sort(); //sorts table based on (first) name
         }
         catch(Exception e){
             System.out.println(e);
@@ -341,8 +341,8 @@ public class GUIController implements Initializable{
         q5.add(highestRatedMovieName);
         q5.add((String)director.table.get(3).get(0));
         q5.add(worstRankedMovie);
-//        System.out.println(actor + "'s highest rated movie is " + highestRatedMovieName + ", directed by " + (String)director.table.get(3).get(0) + ".");
-//        System.out.println("The worst ranked movie directed by " + (String)director.table.get(3).get(0) + " is " + worstRankedMovie +".");
+        //System.out.println(actor + "'s highest rated movie is " + highestRatedMovieName + ", directed by " + (String)director.table.get(3).get(0) + ".");
+        //System.out.println("The worst ranked movie directed by " + (String)director.table.get(3).get(0) + " is " + worstRankedMovie +".");
         return q5;
     }
 
@@ -350,23 +350,21 @@ public class GUIController implements Initializable{
     @FXML
     public void directorWorstMovie() {
         String actorN = actorR.getText(); //stores user input
-        //String actor_name = actorN + "'s";
-        actor.setText(actorN + "'s");
         actorR.clear();
 
-        ArrayList<String> q5 = new ArrayList<String>();
+        ArrayList<String> q5;
         String direct = "";
         String best = "";
         String worst = "";
         try {
-            q5 = query5(actorN); //receives table with movies and actors that have played user inputted character
-            //contains highest rated movie, director, worst rated movie
-            direct = q5.get(1);
-            direct = direct.replace("_"," "); //add spaces back in
+            q5 = query5(actorN); //receives arraylist that contains highest rated movie, director, and worst rated movie (in that order)
             best = q5.get(0);
             best = best.replace("_"," "); //add spaces back in
+            direct = q5.get(1);
+            direct = direct.replace("_"," "); //add spaces back in
             worst = q5.get(2);
             worst = worst.replace("_"," "); //add spaces back in
+            actor.setText(actorN + "'s");
             bestMovie.setText(best);
             director.setText(direct + ".");
             director2.setText(direct);
@@ -380,9 +378,10 @@ public class GUIController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        //set up GUI table columns
         actorName.setCellValueFactory(new PropertyValueFactory<Character, String>("name"));
         movieName.setCellValueFactory(new PropertyValueFactory<Character, String>("movie"));
-        tableView.getSortOrder().add(actorName);
+        tableView.getSortOrder().add(actorName); //sort by actor (first) name
     }
 }
 

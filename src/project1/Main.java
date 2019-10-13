@@ -40,6 +40,7 @@ public class Main extends Application{
         List<Movie> moviesList = movie_parser.deserializeMovies("src/Files/movies.json");
         List<Credits> creditsList = movie_parser.deserializeCredits("src/Files/credits.json");
 
+        //movie table
         Table movies = new Table("movies");
         movies.enterColumns(0, "M_ID","INTEGER");
         movies.enterColumns(1,"Title", "VARCHAR");
@@ -53,12 +54,14 @@ public class Main extends Application{
         movies.enterColumns(9,"Revenue", "INTEGER");
         movies.enterColumns(10, "Original_Language", "VARCHAR");
 
+        //cast table
         Table cast = new Table("cast");
         cast.enterColumns(0, "Movie_ID", "INTEGER");
         cast.enterColumns(1, "ID", "INTEGER");
         cast.enterColumns(2, "Name", "VARCHAR");
         cast.enterColumns(3, "Character", "VARCHAR");
 
+        //crew table
         Table crew = new Table("crew");
         crew.enterColumns(0, "Movie_ID", "INTEGER");
         crew.enterColumns(1, "ID", "INTEGER");
@@ -68,8 +71,8 @@ public class Main extends Application{
 
         for (int i=0; i < moviesList.size(); i++){
             movies.insertData(0, Integer.toString(moviesList.get(i).getId()), true);
-            //Title
 
+            //Title
             String string = Normalizer.normalize(moviesList.get(i).getTitle(), Normalizer.Form.NFD);
             String title = string.replaceAll("[^\\p{ASCII}]", "");
 
@@ -220,22 +223,17 @@ public class Main extends Application{
         crew.table_to_file();
 
 
-        //GUI INPUTS THAT DO THINGS
-        //PUT THE INPUTS HERE
-        //DEPENDING ON INPUTS IT CREATES AN INPUT.TXT
-
-        launch(args);
+        launch(args); //launch GUI
 
 
-
+        //for quick testing
         boolean query3 = false;
         boolean query4 = false;
         boolean query5 = false;
 
         String Actor_Name_Q3 = "Tom Hanks";
-        String Character_Name_Q4 = "Child"; //Eventually this will be input from GUI
+        String Character_Name_Q4 = "Child";
         String Actor_Name_Q5 = "Kevin Bacon";
-
 
         // QUERY3
         if(query3){
@@ -477,6 +475,7 @@ public class Main extends Application{
             System.out.println(Actor_Name_Q5 + "'s highest rated movie is " + highestRatedMovieName + ", directed by " + (String)director.table.get(3).get(0) + ".");
             System.out.println("The worst ranked movie directed by " + (String)director.table.get(3).get(0) + " is " + worstRankedMovie +".");
         }
+
 
 
         //DO THIS CHUNK FOR EVERY QUERY ABOVE
