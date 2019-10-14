@@ -159,7 +159,8 @@ public class GUIController implements Initializable{
 
     public Table query4(String character) throws Exception{
         String character_name = character.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
-                .replace(" ", "_").replace(".", "").replace("'", "");
+                .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_")
+                .replace("#", "").replace("\"", "");
 
         File file = new File("src/Files/input_query4.txt");
 
