@@ -31,6 +31,7 @@ public class Dbms {
         }
         return index;
     }
+
     // Checks for duplicates within the table
     public boolean is_duplicate(List<Object> row_table, Table table){
         int column = table.table.size();
@@ -461,7 +462,7 @@ public class Dbms {
     // Compares two operands using operator in temp table
     public void compares_from_temp(String operand1, String operand2, String operator, Table table){
         //System.out.println("TABLE: ");
-        table.printTable();
+        //table.printTable();
         int index_column = table.getColumnNumber(operand1);
         //System.out.println("index_column: " + index_column);
         List<Integer> index_list = new ArrayList<>();
