@@ -204,6 +204,7 @@ public class GUIController implements Initializable{
         String character = charNameR.getText(); //stores user input
         charNameR.clear();
         tableView.getItems().clear(); //clears table
+        charName.setText("");
 
         try {
             Table output = query4(character); //receives table with movies and actors that have played user inputted character
