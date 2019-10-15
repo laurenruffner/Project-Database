@@ -351,6 +351,7 @@ public class MyRulesBaseListener extends RulesBaseListener {
                 fw.write("\n");
             }
             fw.close();
+            myDbms.table_list.get(index).table = null;
             myDbms.table_list.remove(index); //remove table from myDbms object
             myDbms.table_names.remove(index);
         }

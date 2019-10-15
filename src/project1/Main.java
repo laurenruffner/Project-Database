@@ -30,7 +30,7 @@ public class Main extends Application{
         primaryStage.setTitle("Movie Database GUI");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        }
+    }
 
 
     public static void main(String[] args) throws IOException {
@@ -227,16 +227,93 @@ public class Main extends Application{
 
 
         //for quick testing
+        boolean query2 = true;
         boolean query3 = false;
         boolean query4 = false;
         boolean query5 = false;
 
+        int costars_Q3 = 2;
+        String Actor_Name_Q2 = "Julia Worsley";
         String Actor_Name_Q3 = "Tom Hanks";
         String Character_Name_Q4 = "Child";
         String Actor_Name_Q5 = "Kevin Bacon";
 
+        // QUERY2
+        if(query2){
+            String character_name = Actor_Name_Q2.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                    .replace(" ", "_").replace(".", "").replace("'", "")
+                    .replace("-", "_");
+            File file = new File("src/Files/input_query2.txt");
+            String fileContent = "OPEN movies;\n" +
+                    "OPEN cast;\n" +
+                    "actor <- select (Name == \"" + character_name + "\") cast;\n" + //table of all of the instances of this actor
+                    "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor);\n" + //table where ids are the same
+                    "CLOSE movies;\n" +
+                    "CLOSE actor;\n" +
+                    "actors_movies <- project (M_ID) actor_and_movies;\n" + //table of movie ids for actor
+                    "castproduct <- cast * actors_movies;\n" +
+                    "costarsFULL <- select (Movie_ID == M_ID) castproduct;\n" + //table of all costars in all actors movies
+                    "CLOSE castproduct;\n" +
+                    "costars <- project (Name, M_ID) costarsFULL;"; // list of all costars
+                    //"costars <- project (Name, M_ID) (select (Movie_ID == M_ID) (cast * actors_movies));";
+
+            FileWriter fileWriter = new FileWriter("src/Files/input_query2.txt");
+            fileWriter.write(fileContent);
+            fileWriter.close();
+
+            File query_five_file = new File("src/Files/input_query2.txt");
+            Scanner scanner = new Scanner(query_five_file);
+            List<String> lines = new ArrayList<>();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() != 0) { lines.add(line); }
+            }
+            MyRulesBaseListener listener = new MyRulesBaseListener();
+            for (String line : lines) {
+                CharStream charStream = CharStreams.fromString(line);
+                RulesLexer lexer = new RulesLexer(charStream);
+                CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+                RulesParser parser = new RulesParser(commonTokenStream);
+                lexer.removeErrorListeners();
+                parser.removeErrorListeners();
+                RulesParser.ProgramContext programContext = parser.program();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(listener, programContext);
+            }
+            Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("costars"));
+            //output.printTable();
+            ArrayList<String> names = new ArrayList<String>();
+            ArrayList<Integer> appearances = new ArrayList<Integer>();
+            for(int i = 0; i < output.table.get(0).size(); i++){
+                String actor = (String)output.table.get(0).get(i);
+                int x = names.indexOf(actor);
+                if(actor.compareTo("NULL") == 0){
+                    // Do Nothing
+                }
+                // if actor is in the list we increase the amount by 1
+                else if(x != -1){
+                    int inc = appearances.get(x) + 1;
+                    appearances.set(x, inc);
+                }
+                // if actor is not already in the list of costars
+                else{
+                    names.add(actor);
+                    appearances.add(1);
+                }
+            }
+            //ArrayList<String> costars = new ArrayList<String>();
+            // Finds costars with input x of appearances with actor
+            System.out.println("List of costars with " + costars_Q3 + " appearances: ");
+            for(int k = 0; k < appearances.size(); k++){
+                if(appearances.get(k) == costars_Q3){
+                    //costars.add(names.get(k));
+                    System.out.println(names.get(k));
+                }
+            }
+        }
+
         // QUERY3
-        if(query3){
+        else if(query3){
             String actor_name = Actor_Name_Q3.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
                     .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
 
