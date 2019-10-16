@@ -223,15 +223,14 @@ public class Main extends Application{
         crew.table_to_file();
 
 
-        //launch(args); //launch GUI
+        launch(args); //launch GUI
 
 
         //for quick testing
         boolean query2 = false;
-        boolean query3 = true;
+        boolean query3 = false;
         boolean query4 = false;
         boolean query5 = false;
-
 
 
         int costars_Q3 = 2;
@@ -307,17 +306,16 @@ public class Main extends Application{
                     appearances.add(1);
                 }
             }
-            //ArrayList<String> costars = new ArrayList<String>();
+            ArrayList<String> costars = new ArrayList<String>();
             // Finds costars with input x of appearances with actor
             System.out.println("List of costars with " + costars_Q3 + " appearances: ");
             for(int k = 0; k < appearances.size(); k++){
                 if(appearances.get(k) == costars_Q3){
-                    //costars.add(names.get(k));
+                    costars.add(names.get(k));
                     System.out.println(names.get(k));
                 }
             }
         }
-
         // QUERY3
         else if(query3){
             String actor_name = Actor_Name_Q3.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")

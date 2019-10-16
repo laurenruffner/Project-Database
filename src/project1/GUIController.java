@@ -25,6 +25,19 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 public class GUIController implements Initializable{
+    //query2
+    @FXML
+    private Text ActorName;
+    @FXML
+    private Text times;
+    @FXML
+    private TableView <Costar> tableView2;
+    @FXML
+    private TableColumn <Costar, String> costarName;
+    @FXML
+    private TextField actorC;
+    @FXML
+    private TextField costarNum;
     //query3
     @FXML
     private TextField actorG;
@@ -58,6 +71,112 @@ public class GUIController implements Initializable{
     private Text worstMovie;
 
 
+    private ArrayList<String> query2(String actorName, int times) throws Exception {
+        String character_name = actorName.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
+                .replace(" ", "_").replace(".", "").replace("'", "")
+                .replace("-", "_");
+        File file = new File("src/Files/input_query2.txt");
+        String fileContent = "OPEN movies;\n" +
+                "OPEN cast;\n" +
+                "actor <- select (Name == \"" + character_name + "\") cast;\n" + //table of all of the instances of this actor
+                "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor);\n" + //table where ids are the same
+                //"SHOW actor_and_movies;\n" +
+                "actors_movies <- project (M_ID) actor_and_movies;\n" + //table of movie ids for actor
+                //"SHOW actors_movies;\n" +
+                "castproduct <- cast * actors_movies;\n" +
+                "costarsFULL <- select (Movie_ID == M_ID) castproduct;\n" + //table of all costars in all actors movies
+                //"SHOW costarsFULL;\n" +
+                "costars <- project (Name, M_ID) costarsFULL;\n";
+        //"SHOW costars;"; // list of all costars
+
+        FileWriter fileWriter = new FileWriter("src/Files/input_query2.txt");
+        fileWriter.write(fileContent);
+        fileWriter.close();
+
+        File query_five_file = new File("src/Files/input_query2.txt");
+        Scanner scanner = new Scanner(query_five_file);
+        List<String> lines = new ArrayList<>();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            if (line.length() != 0) { lines.add(line); }
+        }
+        MyRulesBaseListener listener = new MyRulesBaseListener();
+        for (String line : lines) {
+            CharStream charStream = CharStreams.fromString(line);
+            RulesLexer lexer = new RulesLexer(charStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            RulesParser parser = new RulesParser(commonTokenStream);
+            lexer.removeErrorListeners();
+            parser.removeErrorListeners();
+            RulesParser.ProgramContext programContext = parser.program();
+            ParseTreeWalker walker = new ParseTreeWalker();
+            walker.walk(listener, programContext);
+        }
+
+        Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("costars"));
+        //output.printTable();
+        output.remove_duplicates();
+        //output.printTable();
+        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<Integer> appearances = new ArrayList<Integer>();
+        for(int i = 0; i < output.table.get(0).size(); i++){
+            String actor = (String)output.table.get(0).get(i);
+            int x = names.indexOf(actor);
+            if(actor.compareTo("NULL") == 0){
+                // Do Nothing
+            }
+            // if actor is in the list we increase the amount by 1
+            else if(x != -1){
+                int inc = appearances.get(x) + 1;
+                appearances.set(x, inc);
+            }
+            // if actor is not already in the list of costars
+            else{
+                names.add(actor);
+                appearances.add(1);
+            }
+        }
+        ArrayList<String> costars = new ArrayList<String>();
+        // Finds costars with input x of appearances with actor
+        //System.out.println("List of costars with " + times + " appearances: ");
+        for(int k = 0; k < appearances.size(); k++){
+            if(appearances.get(k) == times){
+                costars.add(names.get(k));
+                //System.out.println(names.get(k));
+            }
+        }
+        return costars;
+    }
+
+    //query2
+    @FXML
+    private void costarCount(){
+        String actor = actorC.getText(); //stores user input
+        String timesString = costarNum.getText(); //stores user input
+        int timesInt = Integer.parseInt(timesString); //covert to int
+        actorC.clear();
+        costarNum.clear();
+        tableView2.getItems().clear(); //clears table
+        ActorName.setText("");
+        times.setText("");
+
+        String costarN = "";
+        try {
+            ArrayList<String> costars = query2(actor, timesInt); //receives arraylist with all costars that costarred certain number of times
+            for (int i = 0; i < costars.size(); ++i) { //go through arraylist
+                costarN = costars.get(i);
+                costarN = costarN.replace("_"," "); //add spaces back in
+                tableView2.getItems().add(new Costar(costarN)); //add entry to GUI table
+            }
+            ActorName.setText(actor);
+            times.setText(timesString);
+            tableView2.sort(); //sorts table based on (first) name
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
     private String query3(String actorName) throws Exception{
         String actor_name = actorName.replaceAll("[^\\p{ASCII}]", "").replaceAll(" '\\.\\*'", "")
                 .replace(" ", "_").replace(".", "").replace("'", "").replace("-", "_");
@@ -68,7 +187,7 @@ public class GUIController implements Initializable{
                 "OPEN cast;\n" +
                 "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
                 "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
-                "actors_genres <- project (Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
+                "actors_genres <- project (M_ID, Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
 
         FileWriter fileWriter = new FileWriter("src/Files/input_query3.txt");
         fileWriter.write(fileContent);
@@ -147,6 +266,8 @@ public class GUIController implements Initializable{
     private void mostCommonGenre(){
         String actor = actorG.getText(); //stores user input
         actorG.clear();
+        actor_name.setText("");
+        genre.setText("");
 
         String mostCommonGenre = "";
         try {
@@ -356,6 +477,11 @@ public class GUIController implements Initializable{
     public void directorWorstMovie() {
         String actorN = actorR.getText(); //stores user input
         actorR.clear();
+        actor.setText("");
+        bestMovie.setText("");
+        director.setText("");
+        director2.setText("");
+        worstMovie.setText("");
 
         ArrayList<String> q5;
         String direct = "";
@@ -383,7 +509,11 @@ public class GUIController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //set up GUI table columns
+        //set up GUI table columns (query2)
+        costarName.setCellValueFactory(new PropertyValueFactory<Costar, String>("name"));
+        tableView2.getSortOrder().add(costarName); //sort by actor (first) name
+
+        //set up GUI table columns (query 4)
         actorName.setCellValueFactory(new PropertyValueFactory<Character, String>("name"));
         movieName.setCellValueFactory(new PropertyValueFactory<Character, String>("movie"));
         tableView.getSortOrder().add(actorName); //sort by actor (first) name
