@@ -68,7 +68,7 @@ public class GUIController implements Initializable{
                 "OPEN cast;\n" +
                 "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
                 "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
-                "actors_genres <- project (Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
+                "actors_genres <- project (M_ID, Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
 
         FileWriter fileWriter = new FileWriter("src/Files/input_query3.txt");
         fileWriter.write(fileContent);
