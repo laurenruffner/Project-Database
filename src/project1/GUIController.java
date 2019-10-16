@@ -95,12 +95,15 @@ public class GUIController implements Initializable{
         }
 
         Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_genres"));
+        //output.printTable();
+        output.remove_duplicates();
+        //output.printTable();
         ArrayList<String> genres = new ArrayList<String>();
         ArrayList<Integer> gCount = new ArrayList<Integer>();
         int nullamt = 0;
         //output.printTable();
         // nested for loops to look at each genre in the table
-        for(int j = 0; j < 3; j++) {
+        for(int j = 1; j < 4; j++) {
             for (int i = 0; i < output.table.get(j).size(); i++) {
                 String genre = (String)output.table.get(j).get(i);
                 int x = genres.indexOf(genre);

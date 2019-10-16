@@ -444,4 +444,62 @@ public class Table {
             System.out.println(e);
         }
     }
+
+//    public boolean is_duplicate(List<Object> row_table, Table table){
+//        int column = table.table.size();
+//        int row = table.table.get(0).size();
+//        for(int i=0; i < row; i++){
+//            List<Object> row_table2= new ArrayList<>();
+//            for(int j=0; j < column; j++){
+//                row_table2.add(table.table.get(j).get(i));
+//            }
+//            if (row_table.equals(row_table2)){
+//                return true;
+//            };
+//        }
+//        return false;
+//    }
+     void remove_duplicates(){
+        List<Integer> dup_indicies = new ArrayList<>();
+        int count = 0;
+        int column = table.size();
+        int row = table.get(0).size();
+        for (int i=0; i  < row; i++){
+            List<Object> row1 = new ArrayList<>();
+            for (int j=0; j < column; j++){
+                row1.add(table.get(j).get(i));
+            }
+            for (int k=i+1; k < row; k++){
+                List<Object> row2 = new ArrayList<>();
+                for (int l=0; l < column; l++){
+                    row2.add(table.get(l).get(k));
+                }
+                if (row1.equals(row2)){
+                    //System.out.println("Row Number: " + i);
+                    //System.out.println(row1);
+                    //System.out.println(row2);
+                    //System.out.println("-----------------------------");
+                    dup_indicies.add(i);
+                }
+            }
+        }
+        //System.out.println(dup_indicies);
+        LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(dup_indicies);
+        dup_indicies = new ArrayList<>(hashSet);
+        //System.out.println(dup_indicies);
+        for (int m=dup_indicies.size()-1; m >=0; m--){
+            //System.out.println("INDEX: " + dup_indicies.get(m));
+            for(int n=0; n < column; n++){
+                count++;
+                int index = dup_indicies.get(m);
+                //System.out.println(index);
+                //System.out.print(table.get(n).get(dup_indicies.get(m)));
+                table.get(n).remove(index);
+            }
+           // System.out.println("\n");
+        }
+        //System.out.println("Count: " + count);
+        //printTable();
+     }
+
 }

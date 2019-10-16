@@ -223,20 +223,23 @@ public class Main extends Application{
         crew.table_to_file();
 
 
-        launch(args); //launch GUI
+        //launch(args); //launch GUI
 
 
         //for quick testing
-        boolean query2 = true;
-        boolean query3 = false;
+        boolean query2 = false;
+        boolean query3 = true;
         boolean query4 = false;
         boolean query5 = false;
 
+
+
         int costars_Q3 = 2;
-        String Actor_Name_Q2 = "Julia Worsley";
+        String Actor_Name_Q2 = "Will Smith";
         String Actor_Name_Q3 = "Tom Hanks";
         String Character_Name_Q4 = "Child";
         String Actor_Name_Q5 = "Kevin Bacon";
+
 
         // QUERY2
         if(query2){
@@ -248,14 +251,14 @@ public class Main extends Application{
                     "OPEN cast;\n" +
                     "actor <- select (Name == \"" + character_name + "\") cast;\n" + //table of all of the instances of this actor
                     "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor);\n" + //table where ids are the same
-                    "CLOSE movies;\n" +
-                    "CLOSE actor;\n" +
+                    //"SHOW actor_and_movies;\n" +
                     "actors_movies <- project (M_ID) actor_and_movies;\n" + //table of movie ids for actor
+                    //"SHOW actors_movies;\n" +
                     "castproduct <- cast * actors_movies;\n" +
                     "costarsFULL <- select (Movie_ID == M_ID) castproduct;\n" + //table of all costars in all actors movies
-                    "CLOSE castproduct;\n" +
-                    "costars <- project (Name, M_ID) costarsFULL;"; // list of all costars
-                    //"costars <- project (Name, M_ID) (select (Movie_ID == M_ID) (cast * actors_movies));";
+                    //"SHOW costarsFULL;\n" +
+                    "costars <- project (Name, M_ID) costarsFULL;\n";
+                    //"SHOW costars;"; // list of all costars
 
             FileWriter fileWriter = new FileWriter("src/Files/input_query2.txt");
             fileWriter.write(fileContent);
@@ -280,7 +283,10 @@ public class Main extends Application{
                 ParseTreeWalker walker = new ParseTreeWalker();
                 walker.walk(listener, programContext);
             }
+
             Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("costars"));
+            //output.printTable();
+            output.remove_duplicates();
             //output.printTable();
             ArrayList<String> names = new ArrayList<String>();
             ArrayList<Integer> appearances = new ArrayList<Integer>();
@@ -323,7 +329,7 @@ public class Main extends Application{
                     "OPEN cast;\n" +
                     "actor <- select (Name == \"" + actor_name + "\") cast;\n" + //table of all of te instances of this actor
                     "actor_and_movies <- select (M_ID == Movie_ID) (movies * actor)\n" +//table where ids are the same
-                    "actors_genres <- project (Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
+                    "actors_genres <- project (M_ID, Genre1, Genre2, Genre3) actor_and_movies;"; //table of genres for actor
 
             FileWriter fileWriter = new FileWriter("src/Files/input_query3.txt");
             fileWriter.write(fileContent);
@@ -350,14 +356,18 @@ public class Main extends Application{
             }
 
             Table output = listener.myDbms.table_list.get(listener.myDbms.indexOfTable("actors_genres"));
+            //output.printTable();
+            output.remove_duplicates();
+            //output.printTable();
             ArrayList<String> genres = new ArrayList<String>();
             ArrayList<Integer> gCount = new ArrayList<Integer>();
             int nullamt = 0;
             //output.printTable();
             // nested for loops to look at each genre in the table
-            for(int j = 0; j < 3; j++) {
+            for(int j = 1; j < 4; j++) {
                 for (int i = 0; i < output.table.get(j).size(); i++) {
                     String genre = (String)output.table.get(j).get(i);
+                    //System.out.println(genre);
                     int x = genres.indexOf(genre);
                     // if genre is NULL do nothing
                     if(genre.compareTo("NULL") == 0) {
